@@ -499,4 +499,36 @@
         resultsBlock.style.display = 'block';
         
         let subjName = subject === 'math' ? 'Математике' : subject === 'russian' ? 'Русскому языку' : 'Окружающему миру';
-        document.getElementById('grade-title').innerText = `Тво
+        document.getElementById('grade-title').innerText = `Твоя итоговая оценка по ${subjName}:`;
+        document.getElementById('grade-value').innerText = grade;
+        document.getElementById('percentage-value').innerText = `Правильных ответов: ${percentage}% (${correctCount} из ${totalQuestions})`;
+        
+        const recList = document.getElementById('recommendation-list');
+        recList.innerHTML = '';
+        
+        if (wrongTopics.size === 0) {
+            const li = document.createElement('li');
+            li.innerHTML = '<b>Великолепный результат!</b> Ошибок нет. Весь курс усвоен на отлично!';
+            recList.appendChild(li);
+        } else {
+            wrongTopics.forEach(topic => {
+                const li = document.createElement('li');
+                li.innerHTML = `Стоит обратить внимание на тему: <b>«${topic}»</b>`;
+                recList.appendChild(li);
+            });
+        }
+        
+        document.getElementById('detailed-report').innerHTML = detailedReportHtml;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetCurrentTest() {
+        document.getElementById(`${currentSubject}-form`).reset();
+        document.querySelectorAll('.option-label').forEach(el => el.classList.remove('selected'));
+        switchSubject(currentSubject);
+    }
+
+    window.onload = initTests;
+</script>
+</body>
+</html>

@@ -36,6 +36,9 @@
       overflow-x: hidden;
       transition: background-color 0.3s ease;
     }
+    h1 {
+      color:var(--main-teal);
+    }
 
     /* Анимация ошибки на весь экран */
     body.wrong-answer {
@@ -59,7 +62,6 @@
       font-size: 14px;
       color: var(--main-teal);
       font-weight: bold;
-     margin-top:100px;
     }
 
     /* Основной контейнер */
@@ -250,6 +252,7 @@
   <main>
     <!-- ЭКРАН 1: Настройка тренажера -->
     <div id="setup-screen" class="card">
+      <h1>Тренажер таблицы умножения</h1>
       <h2>Выберите числа для тренировки:</h2>
       <div class="selector-grid">
         <!-- Генерируем чекбоксы от 2 до 10 -->

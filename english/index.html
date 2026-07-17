@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Умный тренажер по английскому языку</title>
+  <style>
+    :root {
+      --bg-color: #fff0f3; /* Нежно-розовый фон */
+      --main-teal: #008080; /* Морская волна */
+      --dark-teal: #005a5a;
+      --light-teal: #e6f2f2;
+      --burgundy: #800000; /* Бордовый для деталей */
+      --burgundy-hover: #b30000;
+      --text-main: #4a4a4a;
+      --white: #ffffff;
+      --wrong-flash: rgba(214, 48, 49, 0.4); /* Вспышка ошибки */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease;
+    }
+
+    body.wrong-answer {
+      background-color: var(--wrong-flash);
+    }
+
+    /* Шапка с логотипом */
+    header {
+      width: 100%;
+      padding: 20px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      max-width: 1000px;
+    }
+
+    .logo-placeholder {
+      width: 150px;
+      height: 50px;
+      border: 2px dashed var(--main-teal);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--main-teal);
+      font-weight: bold;
+      background-color: var(--white);
+    }
+
+    /* Основной контейнер */
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 650px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 128, 128, 0.1);
+      border-top: 5px solid var(--main-teal);
+      text-align: center;
+    }
+
+    /* Счётчик результатов */
+    .score-board {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 25px;
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--text-main);
+    }
+
+    .score-val {
+      color: var(--burgundy);
+    }
+
+    .theme-indicator {
+      display: inline-block;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background-color: var(--light-teal);
+      color: var(--main-teal);
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    .question-box {
+      font-size: 26px;
+      font-weight: bold;
+      color: var(--text-main);
+      margin: 25px 0;
+      line-height: 1.4;
+    }
+
+    .highlight-word {
+      color: var(--burgundy);
+      border-bottom: 3px dashed var(--burgundy);
+      padding-bottom: 2px;
+    }
+
+    /* Сетка вариантов ответа */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .option-btn {
+      background-color: var(--white);
+      border: 2px solid var(--main-teal);
+      color: var(--main-teal);
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-btn:hover {
+      background-color: var(--main-teal);
+      color: var(--white);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 128, 128, 0.15);
+    }
+
+    .option-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Canvas для конфетти */
+    #confetti-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Подвал */
+    footer {
+      width: 100%;
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: var(--main-teal);
+      font-weight: 500;
+    }
+
+    @media (max-width: 500px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+      .question-box {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <header>
+    <div class="logo-placeholder">Логотип</div>
+  </header>
+
+  <main>
+    <div id="trainer-screen" class="card">
+      <div class="score-board">
+        <div>Решено: <span id="total-count" class="score-val">0</span></div>
+        <div>Правильно: <span id="correct-count" class="score-val">0</span></div>
+      </div>
+      
+      <div class="theme-indicator" id="current-theme">Loading...</div>
+      <div class="question-box" id="question-text">Creating the first challenge...</div>
+      
+      <div class="options-grid" id="options-container">
+        <!-- Кнопки сгенерируются автоматически -->
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Мастерская IT-обучения "Кот и Код"
+  </footer>
+
+  <script>
+    // --- ЭФФЕКТ КОНФЕТТИ (CANVAS) ---
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let confetti = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class ConfettiParticle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + Math.random() * 20;
+        this.size = Math.random() * 6 + 4;
+        this.speedX = Math.random() * 4 - 2;
+        this.speedY = -(Math.random() * 8 + 6);
+        this.color = `hsl(${Math.random() * 360}, 80%, 60%)`;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.speedY += 0.2;
+      }
+      draw() {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function triggerConfetti() {
+      confetti = [];
+      for (let i = 0; i < 70; i++) {
+        confetti.push(new ConfettiParticle());
+      }
+      animateConfetti();
+    }
+
+    let animationFrame;
+    function animateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach((p, index) => {
+        p.update();
+        p.draw();
+        if (p.y > canvas.height + 10) {
+          confetti.splice(index, 1);
+        }
+      });
+      if (confetti.length > 0) {
+        animationFrame = requestAnimationFrame(animateConfetti);
+      } else {
+        cancelAnimationFrame(animationFrame);
+      }
+    }
+
+    // --- БАЗА ЗАДАНИЙ (50 ВОПРОСОВ) ---
+    const questionDatabase = [
+      // --- GLOGAL TO BE (10 вопросов) ---
+      { q: "Вставь пропуск: I <span class='highlight-word'>___</span> a brave pirate.", options: ["am", "is", "are"], correct: "am", theme: "Verb TO BE" },
+      { q: "Вставь пропуск: She <span class='highlight-word'>___</span> my best friend.", options: ["is", "am", "are"], correct: "is", theme: "Verb TO BE" },
+      { q: "Вставь пропуск: They <span class='highlight-word'>___</span> happy family.", options: ["are", "is", "am"], correct: "are", theme: "Verb TO BE" },
+      { q: "Вставь пропуск: <span class='highlight-word'>___</span> you ready for the game?", options: ["Are", "Is", "Am"], correct: "Are", theme: "Verb TO BE" },
+      { q: "Вставь пропуск: The cute puppy <span class='highlight-word'>___</span> under the bed.", options: ["is", "are", "am"], correct: "is", theme: "Verb TO BE" },
+      { q: "Вставь пропуск: My toys <span class='highlight-word'>___</span> in the box.", options: ["are", "is", "was"], correct: "are", theme: "Verb TO BE" },
+      { q: "Вставь пропуск: It <span class='highlight-word'>___</span> a sunny day today.", options: ["is", "am", "are"], correct: "is", theme: "Verb TO BE" },
+      { q: "Вставь пропуск: We <span class='highlight-word'>___</span> clever students.", options: ["are", "is", "am"], correct: "are", theme: "Verb TO BE" },
+      { q: "Вставь пропуск: Where <span class='highlight-word'>___</span> my books?", options: ["are", "is", "am"], correct: "are", theme: "Verb TO BE" },
+      { q: "Вставь пропуск: He <span class='highlight-word'>___</span> not a doctor, he is a teacher.", options: ["is", "are", "am"], correct: "is", theme: "Verb TO BE" },
+
+      // --- HAVE GOT / HAS GOT (10 вопросов) ---
+      { q: "Вставь пропуск: I <span class='highlight-word'>___</span> a funny cat.", options: ["have got", "has got"], correct: "have got", theme: "Have got / Has got" },
+      { q: "Вставь пропуск: Tim <span class='highlight-word'>___</span> a big red bicycle.", options: ["has got", "have got"], correct: "has got", theme: "Have got / Has got" },
+      { q: "Вставь пропуск: We <span class='highlight-word'>___</span> many ideas for our code.", options: ["have got", "has got"], correct: "have got", theme: "Have got / Has got" },
+      { q: "Вставь пропуск: An elephant <span class='highlight-word'>___</span> a very long nose.", options: ["has got", "have got"], correct: "has got", theme: "Have got / Has got" },
+      { q: "Вставь пропуск: <span class='highlight-word'>___</span> you got a sister?", options: ["Have", "Has"], correct: "Have", theme: "Have got / Has got" },
+      { q: "Вставь пропуск: She <span class='highlight-word'>___</span> got any green apples.", options: ["hasn't", "haven't"], correct: "hasn't", theme: "Have got / Has got" },
+      { q: "Вставь пропуск: They <span class='highlight-word'>___</span> a beautiful garden.", options: ["have got", "has got"], correct: "have got", theme: "Have got / Has got" },
+      { q: "Вставь пропуск: <span class='highlight-word'>___</span> she got a computer?", options: ["Has", "Have"], correct: "Has", theme: "Have got / Has got" },
+      { q: "Вставь пропуск: My monsters <span class='highlight-word'>___</span> got scary teeth.", options: ["have", "has"], correct: "have", theme: "Have got / Has got" },
+      { q: "Вставь пропуск: He <span class='highlight-word'>___</span> got a headache today.", options: ["has", "have"], correct: "has", theme: "Have got / Has got" },
+
+      // --- PRESENT SIMPLE (10 вопросов) ---
+      { q: "Вставь пропуск: He <span class='highlight-word'>___</span> computer games every day.", options: ["plays", "play", "playing"], correct: "plays", theme: "Present Simple" },
+      { q: "Вставь пропуск: They <span class='highlight-word'>___</span> to school on foot.", options: ["go", "goes", "going"], correct: "go", theme: "Present Simple" },
+      { q: "Вставь пропуск: <span class='highlight-word'>___</span> you like ice cream?", options: ["Do", "Does", "Are"], correct: "Do", theme: "Present Simple" },
+      { q: "Вставь пропуск: She <span class='highlight-word'>___</span> not drink coffee.", options: ["does", "do", "is"], correct: "does", theme: "Present Simple" },
+      { q: "Вставь пропуск: My sister <span class='highlight-word'>___</span> English very well.", options: ["speaks", "speak", "speaking"], correct: "speaks", theme: "Present Simple" },
+      { q: "Вставь пропуск: Where <span class='highlight-word'>___</span> they live?", options: ["do", "does", "are"], correct: "do", theme: "Present Simple" },
+      { q: "Вставь пропуск: The sun <span class='highlight-word'>___</span> in the east.", options: ["rises", "rise", "rising"], correct: "rises", theme: "Present Simple" },
+      { q: "Вставь пропуск: We often <span class='highlight-word'>___</span> our grandparents.", options: ["visit", "visits", "visiting"], correct: "visit", theme: "Present Simple" },
+      { q: "Вставь пропуск: <span class='highlight-word'>___</span> your dad drive a car?", options: ["Does", "Do", "Is"], correct: "Does", theme: "Present Simple" },
+      { q: "Вставь пропуск: Cats <span class='highlight-word'>___</span> milk.", options: ["love", "loves", "loving"], correct: "love", theme: "Present Simple" },
+
+      // --- PRESENT CONTINUOUS (10 вопросов) ---
+      { q: "Вставь пропуск: Look! The birds <span class='highlight-word'>___</span> in the sky.", options: ["are flying", "is flying", "fly"], correct: "are flying", theme: "Present Continuous" },
+      { q: "Вставь пропуск: I <span class='highlight-word'>___</span> my homework right now.", options: ["am doing", "is doing", "do"], correct: "am doing", theme: "Present Continuous" },
+      { q: "Вставь пропуск: Listen! She <span class='highlight-word'>___</span> a nice song.", options: ["is singing", "are singing", "sings"], correct: "is singing", theme: "Present Continuous" },
+      { q: "Вставь пропуск: <span class='highlight-word'>___</span> they writing a code at the moment?", options: ["Are", "Is", "Do"], correct: "Are", theme: "Present Continuous" },
+      { q: "Вставь пропуск: He <span class='highlight-word'>___</span> not sleeping, he is reading.", options: ["is", "are", "am"], correct: "is", theme: "Present Continuous" },
+      { q: "Вставь пропуск: What <span class='highlight-word'>___</span> you drawing now?", options: ["are", "is", "do"], correct: "are", theme: "Present Continuous" },
+      { q: "Вставь пропуск: We <span class='highlight-word'>___</span> a funny movie at the moment.", options: ["are watching", "is watching", "watch"], correct: "are watching", theme: "Present Continuous" },
+      { q: "Вставь пропуск: The baby <span class='highlight-word'>___</span> in the bed right now.", options: ["is crying", "are crying", "cries"], correct: "is crying", theme: "Present Continuous" },
+      { q: "Вставь пропуск: It <span class='highlight-word'>___</span> outside. Take your umbrella!", options: ["is raining", "are raining", "rains"], correct: "is raining", theme: "Present Continuous" },
+      { q: "Вставь пропуск: Why <span class='highlight-word'>___</span> she crying?", options: ["is", "are", "do"], correct: "is", theme: "Present Continuous" },
+
+      // --- СЛОВАРНЫЙ ЗАПАС (10 вопросов) ---
+      { q: "Как переводится слово: <span class='highlight-word'>Cabbage</span>", options: ["Капуста", "Огурец", "Тыква", "Морковь"], correct: "Капуста", theme: "Vocabulary" },
+      { q: "Выбери перевод: <span class='highlight-word'>Черепаха</span>", options: ["Turtle", "Frog", "Lizard", "Spider"], correct: "Turtle", theme: "Vocabulary" },
+      { q: "Как переводится слово: <span class='highlight-word'>Thursday</span>", options: ["Четверг", "Вторник", "Суббота", "Пятница"], correct: "Четверг", theme: "Vocabulary" },
+      { q: "Выбери правильный перевод: <span class='highlight-word'>Сентябрь</span>", options: ["September", "October", "November", "December"], correct: "September", theme: "Vocabulary" },
+      { q: "Что это за часть тела: <span class='highlight-word'>Shoulders</span>", options: ["Плечи", "Колени", "Пальцы", "Локти"], correct: "Плечи", theme: "Vocabulary" },
+      { q: "Как переводится: <span class='highlight-word'>Kitchen</span>", options: ["Кухня", "Спальня", "Гостиная", "Ванная"], correct: "Кухня", theme: "Vocabulary" },
+      { q: "Выбери слово, означающее <span class='highlight-word'>'Снежный'</span>", options: ["Snowy", "Rainy", "Windy", "Sunny"], correct: "Snowy", theme: "Vocabulary" },
+      { q: "Как переводится слово: <span class='highlight-word'>Pineapple</span>", options: ["Ананас", "Яблоко", "Груша", "Апельсин"], correct: "Ананас", theme: "Vocabulary" },
+      { q: "Найди лишнее слово в группе одежды:", options: ["Bread", "T-shirt", "Jeans", "Jacket"], correct: "Bread", theme: "Vocabulary" },
+      { q: "Как по-английски пишется <span class='highlight-word'>'Карандаш'</span>?", options: ["Pencil", "Pen", "Ruler", "Book"], correct: "Pencil", theme: "Vocabulary" }
+    ];
+
+    // --- УМНЫЙ АЛГОРИТМ ПЕРЕМЕШИВАНИЯ (ФИШЕР-ЙЕТС) ---
+    let shuffledQueue = [];
+    let queueIndex = 0;
+    
+    let scoreTotal = 0;
+    let scoreCorrect = 0;
+    let currentQuestion = null;
+
+    function shuffleArray(array) {
+      let shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    function initTrainer() {
+      shuffledQueue = shuffleArray(questionDatabase);
+      queueIndex = 0;
+      generateQuestion();
+    }
+
+    function generateQuestion() {
+      // Когда очередь заканчивается, пересобираем и перемешиваем её заново
+      if (queueIndex >= shuffledQueue.length) {
+        shuffledQueue = shuffleArray(questionDatabase);
+        queueIndex = 0;
+      }
+
+      currentQuestion = shuffledQueue[queueIndex];
+      queueIndex++;
+
+      // Заполнение данных на экране
+      document.getElementById('current-theme').textContent = currentQuestion.theme;
+      document.getElementById('question-text').innerHTML = currentQuestion.q;
+
+      const container = document.getElementById('options-container');
+      container.innerHTML = '';
+
+      // Генерация динамических кнопок вариантов ответов
+      currentQuestion.options.forEach(option => {
+        const button = document.createElement('button');
+        button.className = 'option-btn';
+        button.textContent = option;
+        button.onclick = () => checkAnswer(option);
+        container.appendChild(button);
+      });
+    }
+
+    function checkAnswer(selectedOption) {
+      scoreTotal++;
+
+      if (selectedOption === currentQuestion.correct) {
+        scoreCorrect++;
+        triggerConfetti();
+      } else {
+        document.body.classList.add('wrong-answer');
+        setTimeout(() => {
+          document.body.classList.remove('wrong-answer');
+        }, 500);
+      }
+
+      // Обновление счётчиков на карточке
+      document.getElementById('total-count').textContent = scoreTotal;
+      document.getElementById('correct-count').textContent = scoreCorrect;
+
+      // Мгновенный переход к следующему заданию
+      generateQuestion();
+    }
+
+    // Старт при первой загрузке
+    window.onload = initTrainer;
+  </script>
+</body>
+</html>

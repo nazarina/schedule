@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Тренажер по русскому языку</title>
+  <title>Умный тренажер по русскому языку</title>
   <style>
     :root {
       --bg-color: #fff0f3; /* Нежно-розовый фон */
       --main-teal: #008080; /* Морская волна */
       --dark-teal: #005a5a;
       --light-teal: #e6f2f2;
-      --burgundy: #800000; /* Бордовый для акцентов */
+      --burgundy: #800000; /* Бордовый для деталей */
       --burgundy-hover: #b30000;
       --text-main: #4a4a4a;
       --white: #ffffff;
-      --wrong-flash: rgba(214, 48, 49, 0.4); /* Вспышка при ошибке */
+      --wrong-flash: rgba(214, 48, 49, 0.4); /* Красная вспышка */
     }
 
     * {
@@ -85,79 +85,6 @@
       text-align: center;
     }
 
-    h2 {
-      color: var(--main-teal);
-      margin-bottom: 20px;
-      font-size: 22px;
-    }
-
-    /* Выбор тем */
-    .selector-column {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-bottom: 30px;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .checkbox-container {
-      position: relative;
-      display: block;
-    }
-
-    .checkbox-container input {
-      position: absolute;
-      opacity: 0;
-      cursor: pointer;
-      height: 0;
-      width: 0;
-    }
-
-    .checkmark {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 15px 20px;
-      background-color: var(--light-teal);
-      border: 2px solid var(--main-teal);
-      border-radius: 10px;
-      font-size: 18px;
-      font-weight: bold;
-      color: var(--main-teal);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      user-select: none;
-    }
-
-    .checkbox-container input:checked ~ .checkmark {
-      background-color: var(--main-teal);
-      color: var(--white);
-    }
-
-    /* Кнопки действий */
-    .btn {
-      background: linear-gradient(to top, var(--burgundy) 0%, #d63031 100%);
-      color: var(--white);
-      border: none;
-      padding: 14px 35px;
-      font-size: 18px;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: transform 0.1s ease, opacity 0.2s ease;
-      box-shadow: 0 4px 15px rgba(128, 0, 0, 0.3);
-    }
-
-    .btn:hover {
-      opacity: 0.9;
-    }
-
-    .btn:active {
-      transform: scale(0.98);
-    }
-
     /* Счётчик результатов */
     .score-board {
       display: flex;
@@ -170,11 +97,6 @@
 
     .score-val {
       color: var(--burgundy);
-    }
-
-    /* Игровой экран */
-    .game-screen {
-      display: none;
     }
 
     .theme-indicator {
@@ -191,7 +113,7 @@
     }
 
     .question-box {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: bold;
       color: var(--text-main);
       margin: 25px 0;
@@ -261,7 +183,7 @@
         grid-template-columns: 1fr;
       }
       .question-box {
-        font-size: 22px;
+        font-size: 20px;
       }
     }
   </style>
@@ -275,38 +197,17 @@
   </header>
 
   <main>
-    <!-- ЭКРАН 1: Настройка тем -->
-    <div id="setup-screen" class="card">
-      <h2>Выберите темы для тренировки:</h2>
-      <div class="selector-column">
-        <label class="checkbox-container">
-          <input type="checkbox" value="cases" class="theme-checkbox" checked>
-          <span class="checkmark">📌 Падежи (укажи падеж слова)</span>
-        </label>
-        <label class="checkbox-container">
-          <input type="checkbox" value="parts" class="theme-checkbox" checked>
-          <span class="checkmark">🏷️ Части речи (определи часть речи)</span>
-        </label>
-        <label class="checkbox-container">
-          <input type="checkbox" value="grammar" class="theme-checkbox" checked>
-          <span class="checkmark">✍️ Орфограммы (вставь букву)</span>
-        </label>
-      </div>
-      <button class="btn" onclick="startTrainer()">Начать тренировку</button>
-    </div>
-
-    <!-- ЭКРАН 2: Игровой процесс -->
-    <div id="trainer-screen" class="card game-screen">
+    <div id="trainer-screen" class="card">
       <div class="score-board">
         <div>Решено: <span id="total-count" class="score-val">0</span></div>
         <div>Правильно: <span id="correct-count" class="score-val">0</span></div>
       </div>
       
-      <div class="theme-indicator" id="current-theme">Тема</div>
-      <div class="question-box" id="question-text">Загрузка вопроса...</div>
+      <div class="theme-indicator" id="current-theme">Загрузка...</div>
+      <div class="question-box" id="question-text">Придумываем первый вопрос...</div>
       
       <div class="options-grid" id="options-container">
-        <!-- Кнопки вариантов будут генерироваться динамически -->
+        <!-- Кнопки сгенерируются автоматически -->
       </div>
     </div>
   </main>
@@ -375,79 +276,102 @@
       }
     }
 
-    // --- БАЗА ВОПРОСОВ ---
-    const database = {
-      cases: [
-        { q: "Определи падеж: Радоваться <span class='highlight-word'>весне</span>", options: ["Дательный", "Творительный", "Родительный", "Предложный"], correct: "Дательный" },
-        { q: "Определи падеж: Написать в <span class='highlight-word'>тетради</span>", options: ["Предложный", "Дательный", "Родительный", "Винительный"], correct: "Предложный" },
-        { q: "Определи падеж: Гордиться <span class='highlight-word'>победой</span>", options: ["Творительный", "Именительный", "Дательный", "Родительный"], correct: "Творительный" },
-        { q: "Определи падеж: Нет <span class='highlight-word'>времени</span>", options: ["Родительный", "Дательный", "Винительный", "Именительный"], correct: "Родительный" },
-        { q: "Определи падеж: Вижу <span class='highlight-word'>солнце</span>", options: ["Винительный", "Именительный", "Родительный", "Творительный"], correct: "Винительный" }
-      ],
-      parts: [
-        { q: "Какая часть речи: <span class='highlight-word'>Бежать</span>", options: ["Глагол", "Существительное", "Прилагательное", "Местоимение"], correct: "Глагол" },
-        { q: "Какая часть речи: <span class='highlight-word'>Красивый</span>", options: ["Прилагательное", "Существительное", "Глагол", "Наречие"], correct: "Прилагательное" },
-        { q: "Какая часть речи: <span class='highlight-word'>Радость</span>", options: ["Существительное", "Прилагательное", "Глагол", "Предлог"], correct: "Существительное" },
-        { q: "Какая часть речи: <span class='highlight-word'>Быстро</span>", options: ["Наречие", "Глагол", "Прилагательное", "Существительное"], correct: "Наречие" },
-        { q: "Какая часть речи: <span class='highlight-word'>Я</span>", options: ["Местоимение", "Существительное", "Союз", "Предлог"], correct: "Местоимение" }
-      ],
-      grammar: [
-        { q: "Вставь букву: ш..рокий", options: ["и", "ы"], correct: "и" },
-        { q: "Вставь букву: со(?)нце", options: ["л", "Без буквы"], correct: "л" },
-        { q: "Вставь букву: прелес(?)ный", options: ["т", "Без буквы"], correct: "т" },
-        { q: "Вставь букву: зв..зда", options: ["е", "и"], correct: "е" },
-        { q: "Вставь букву: ду(б/п)?", options: ["б", "п"], correct: "б" },
-        { q: "Вставь букву: под..езд", options: ["ъ", "ь"], correct: "ъ" }
-      ]
-    };
+    // --- РАСШИРЕННАЯ БАЗА ВОПРОСОВ ---
+    const questionDatabase = [
+      // --- ПАДЕЖИ ---
+      { q: "Определи падеж: Радоваться <span class='highlight-word'>весне</span>", options: ["Дательный", "Творительный", "Родительный", "Предложный"], correct: "Дательный", theme: "Падежи" },
+      { q: "Определи падеж: Написать в <span class='highlight-word'>тетради</span>", options: ["Предложный", "Дательный", "Родительный", "Винительный"], correct: "Предложный", theme: "Падежи" },
+      { q: "Определи падеж: Гордиться <span class='highlight-word'>победой</span>", options: ["Творительный", "Именительный", "Дательный", "Родительный"], correct: "Творительный", theme: "Падежи" },
+      { q: "Определи падеж: Нет <span class='highlight-word'>времени</span>", options: ["Родительный", "Дательный", "Винительный", "Именительный"], correct: "Родительный", theme: "Падежи" },
+      { q: "Определи падеж: Вижу <span class='highlight-word'>солнце</span>", options: ["Винительный", "Именительный", "Родительный", "Творительный"], correct: "Винительный", theme: "Падежи" },
+      { q: "Определи падеж: Спрятаться под <span class='highlight-word'>зонтом</span>", options: ["Творительный", "Родительный", "Дательный", "Винительный"], correct: "Творительный", theme: "Падежи" },
+      { q: "Определи падеж: Выйти из <span class='highlight-word'>класса</span>", options: ["Родительный", "Дательный", "Предложный", "Именительный"], correct: "Родительный", theme: "Падежи" },
+      { q: "Определи падеж: <span class='highlight-word'>Книга</span> лежит на столе", options: ["Именительный", "Винительный", "Родительный", "Дательный"], correct: "Именительный", theme: "Падежи" },
+      { q: "Определи падеж: Мечтать о <span class='highlight-word'>путешествии</span>", options: ["Предложный", "Родительный", "Дательный", "Творительный"], correct: "Предложный", theme: "Падежи" },
+      { q: "Определи падеж: Купить <span class='highlight-word'>билет</span> на поезд", options: ["Винительный", "Именительный", "Родительный", "Творительный"], correct: "Винительный", theme: "Падежи" },
+      { q: "Определи падеж: Подарить <span class='highlight-word'>маме</span> цветы", options: ["Дательный", "Творительный", "Винительный", "Предложный"], correct: "Дательный", theme: "Падежи" },
+      { q: "Определи падеж: Запах <span class='highlight-word'>хлеба</span>", options: ["Родительный", "Дательный", "Винительный", "Творительный"], correct: "Родительный", theme: "Падежи" },
+      { q: "Определи падеж: Любоваться <span class='highlight-word'>морем</span>", options: ["Творительный", "Предложный", "Винительный", "Родительный"], correct: "Творительный", theme: "Падежи" },
+      { q: "Определи падеж: Рассказать о <span class='highlight-word'>друге</span>", options: ["Предложный", "Дательный", "Винительный", "Именительный"], correct: "Предложный", theme: "Падежи" },
+      { q: "Определи падеж: Письмо от <span class='highlight-word'>дедушки</span>", options: ["Родительный", "Дательный", "Винительный", "Предложный"], correct: "Родительный", theme: "Падежи" },
 
-    // --- ЛОГИКА ТРЕНАЖЕРА ---
-    let activePool = [];
+      // --- ЧАСТИ РЕЧИ ---
+      { q: "Какая часть речи: <span class='highlight-word'>Бежать</span>", options: ["Глагол", "Существительное", "Прилагательное", "Местоимение"], correct: "Глагол", theme: "Части речи" },
+      { q: "Какая часть речи: <span class='highlight-word'>Красивый</span>", options: ["Прилагательное", "Существительное", "Глагол", "Наречие"], correct: "Прилагательное", theme: "Части речи" },
+      { q: "Какая часть речи: <span class='highlight-word'>Радость</span>", options: ["Существительное", "Прилагательное", "Глагол", "Предлог"], correct: "Существительное", theme: "Части речи" },
+      { q: "Какая часть речи: <span class='highlight-word'>Быстро</span>", options: ["Наречие", "Глагол", "Прилагательное", "Существительное"], correct: "Наречие", theme: "Части речи" },
+      { q: "Какая часть речи: <span class='highlight-word'>Я</span>", options: ["Местоимение", "Существительное", "Союз", "Предлог"], correct: "Местоимение", theme: "Части речи" },
+      { q: "Какая часть речи: <span class='highlight-word'>Зеленеет</span>", options: ["Глагол", "Прилагательное", "Существительное", "Наречие"], correct: "Глагол", theme: "Части речи" },
+      { q: "Какая часть речи: <span class='highlight-word'>Одиннадцать</span>", options: ["Числительное", "Существительное", "Местоимение", "Прилагательное"], correct: "Числительное", theme: "Части речи" },
+      { q: "Какая часть речи: <span class='highlight-word'>Под</span> деревом", options: ["Предлог", "Союз", "Частица", "Местоимение"], correct: "Предлог", theme: "Части речи" },
+      { q: "Какая часть речи: Кот <span class='highlight-word'>и</span> собака", options: ["Союз", "Предлог", "Частица", "Местоимение"], correct: "Союз", theme: "Части речи" },
+      { q: "Какая часть речи: <span class='highlight-word'>Громкий</span>", options: ["Прилагательное", "Наречие", "Существительное", "Глагол"], correct: "Прилагательное", theme: "Части речи" },
+      { q: "Какая часть речи: <span class='highlight-word'>Тишина</span>", options: ["Существительное", "Глагол", "Прилагательное", "Наречие"], correct: "Существительное", theme: "Части речи" },
+      { q: "Какая часть речи: <span class='highlight-word'>Весело</span>", options: ["Наречие", "Прилагательное", "Глагол", "Союз"], correct: "Наречие", theme: "Части речи" },
+      { q: "Какая часть речи: <span class='highlight-word'>Ты</span>", options: ["Местоимение", "Существительное", "Предлог", "Числительное"], correct: "Местоимение", theme: "Части речи" },
+      { q: "Какая часть речи: <span class='highlight-word'>Пятый</span>", options: ["Числительное", "Прилагательное", "Местоимение", "Существительное"], correct: "Числительное", theme: "Части речи" },
+      { q: "Какая часть речи: <span class='highlight-word'>Улыбка</span>", options: ["Существительное", "Глагол", "Прилагательное", "Наречие"], correct: "Существительное", theme: "Части речи" },
+
+      // --- ОРФОГРАММЫ ---
+      { q: "Вставь букву: ш..рокий", options: ["и", "ы"], correct: "и", theme: "Орфограммы" },
+      { q: "Вставь букву: со(?)нце", options: ["л", "Без буквы"], correct: "л", theme: "Орфограммы" },
+      { q: "Вставь букву: прелес(?)ный", options: ["т", "Без буквы"], correct: "т", theme: "Орфограммы" },
+      { q: "Вставь букву: зв..зда", options: ["е", "и"], correct: "е", theme: "Орфограммы" },
+      { q: "Вставь букву: ду(б/п)?", options: ["б", "п"], correct: "б", theme: "Орфограммы" },
+      { q: "Вставь букву: под..езд", options: ["ъ", "ь"], correct: "ъ", theme: "Орфограммы" },
+      { q: "Вставь букву: т..жёлый", options: ["я", "е"], correct: "я", theme: "Орфограммы" },
+      { q: "Вставь букву: замер..зать", options: ["е", "и"], correct: "е", theme: "Орфограммы" },
+      { q: "Вставь букву: чу..ство", options: ["в", "Без буквы"], correct: "в", theme: "Орфограммы" },
+      { q: "Вставь букву: пас(?)бище", options: ["т", "Без буквы"], correct: "т", theme: "Орфограммы" },
+      { q: "Вставь букву: опас(?)ный", options: ["Без буквы", "т"], correct: "Без буквы", theme: "Орфограммы" },
+      { q: "Вставь букву: лё..кий", options: ["г", "х"], correct: "г", theme: "Орфограммы" },
+      { q: "Вставь букву: мя..кий", options: ["г", "х"], correct: "г", theme: "Орфограммы" },
+      { q: "Вставь букву: в..юга", options: ["ь", "ъ"], correct: "ь", theme: "Орфограммы" },
+      { q: "Вставь букву: ч..шка", options: ["а", "я"], correct: "а", theme: "Орфограммы" }
+    ];
+
+    // --- УМНЫЙ АЛГОРИТМ ПЕРЕМЕШИВАНИЯ БЕЗ ПОВТОРОВ ---
+    let shuffledQueue = [];
+    let queueIndex = 0;
+    
     let scoreTotal = 0;
     let scoreCorrect = 0;
     let currentQuestion = null;
 
-    function startTrainer() {
-      const checkedBoxes = document.querySelectorAll('.theme-checkbox:checked');
-      activePool = [];
-
-      checkedBoxes.forEach(cb => {
-        const theme = cb.value;
-        // Помечаем каждый вопрос темой для индикатора
-        const taggedQuestions = database[theme].map(item => ({ ...item, themeName: getThemeLabel(theme) }));
-        activePool = activePool.concat(taggedQuestions);
-      });
-
-      if (activePool.length === 0) {
-        alert("Пожалуйста, выберите хотя бы одну тему для тренировки!");
-        return;
+    // Перемешивание Фишера-Йетса
+    function shuffleArray(array) {
+      let shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
+      return shuffled;
+    }
 
-      document.getElementById('setup-screen').style.display = 'none';
-      document.getElementById('trainer-screen').style.display = 'block';
+    function initTrainer() {
+      shuffledQueue = shuffleArray(questionDatabase);
+      queueIndex = 0;
       generateQuestion();
     }
 
-    function getThemeLabel(themeKey) {
-      switch(themeKey) {
-        case 'cases': return 'Падежи';
-        case 'parts': return 'Части речи';
-        case 'grammar': return 'Орфограммы';
-        default: return 'Общее';
-      }
-    }
-
     function generateQuestion() {
-      // Выбираем случайный вопрос из активного пула
-      currentQuestion = activePool[Math.floor(Math.random() * activePool.length)];
+      // Если все вопросы из очереди закончились, перемешиваем заново
+      if (queueIndex >= shuffledQueue.length) {
+        shuffledQueue = shuffleArray(questionDatabase);
+        queueIndex = 0;
+      }
 
-      document.getElementById('current-theme').textContent = currentQuestion.themeName;
+      currentQuestion = shuffledQueue[queueIndex];
+      queueIndex++;
+
+      // Отрисовка
+      document.getElementById('current-theme').textContent = currentQuestion.theme;
       document.getElementById('question-text').innerHTML = currentQuestion.q;
 
       const container = document.getElementById('options-container');
       container.innerHTML = '';
 
-      // Создаем кнопки вариантов ответа
+      // Генерируем варианты ответов
       currentQuestion.options.forEach(option => {
         const button = document.createElement('button');
         button.className = 'option-btn';
@@ -470,13 +394,16 @@
         }, 500);
       }
 
-      // Обновляем статистику
+      // Обновляем статистику на экране
       document.getElementById('total-count').textContent = scoreTotal;
       document.getElementById('correct-count').textContent = scoreCorrect;
 
-      // Сразу переходим к следующему вопросу
+      // Переходим к следующему элементу умной очереди
       generateQuestion();
     }
+
+    // Запускаем сразу при загрузке страницы!
+    window.onload = initTrainer;
   </script>
 </body>
 </html>

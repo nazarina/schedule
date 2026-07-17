@@ -10,7 +10,7 @@
       --main-teal: #008080; /* Морская волна */
       --dark-teal: #005a5a;
       --light-teal: #e6f2f2;
-      --burgundy: #800000; /* Бордовый для деталей */
+      --burgundy: #800000; /* Бордовый для акцентов */
       --burgundy-hover: #b30000;
       --text-main: #4a4a4a;
       --white: #ffffff;
@@ -112,12 +112,29 @@
       font-weight: bold;
     }
 
+    /* Контейнер вопроса */
     .question-box {
       font-size: 26px;
       font-weight: bold;
       color: var(--text-main);
       margin: 25px 0;
-      line-height: 1.4;
+      line-height: 1.8;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Обозначение пропущенного слова */
+    .gap-placeholder {
+      display: inline-block;
+      min-width: 80px;
+      border-bottom: 3px solid var(--burgundy);
+      color: var(--burgundy);
+      text-align: center;
+      margin: 0 5px;
+      font-style: italic;
     }
 
     /* СТИЛИ ДЛЯ ВСПЛЫВАЮЩЕГО ОБЛАЧКА (ТУЛТИПА) */
@@ -128,32 +145,37 @@
     }
 
     .highlight-word {
-      color: var(--burgundy);
-      border-bottom: 3px dashed var(--burgundy);
-      padding-bottom: 2px;
+      color: var(--text-main);
+      border-bottom: 1px dashed #b2bec3;
+      padding-bottom: 1px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .tooltip-container:hover .highlight-word {
+      color: var(--main-teal);
+      border-bottom-color: var(--main-teal);
     }
 
     /* Само облачко */
     .tooltip-text {
       visibility: hidden;
       width: auto;
-      min-width: 120px;
-      max-width: 200px;
+      white-space: nowrap;
       background-color: var(--main-teal);
       color: var(--white);
       text-align: center;
-      border-radius: 8px;
-      padding: 6px 10px;
+      border-radius: 6px;
+      padding: 5px 10px;
       position: absolute;
       z-index: 20;
-      bottom: 125%; /* Показываем над словом */
+      bottom: 130%; /* Над словом */
       left: 50%;
-      transform: translateX(-50%);
-      font-size: 16px;
-      font-weight: normal;
+      transform: translateX(-50%) translateY(5px);
+      font-size: 15px;
+      font-weight: 500;
       box-shadow: 0 5px 15px rgba(0, 128, 128, 0.2);
       opacity: 0;
-      transition: opacity 0.2s ease, transform 0.2s ease;
+      transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
     }
 
     /* Треугольник-стрелочка под облачком */
@@ -168,12 +190,12 @@
       border-color: var(--main-teal) transparent transparent transparent;
     }
 
-    /* Поведение при наведении (десктоп) и фокусе (мобильные) */
+    /* Поведение при наведении и фокусе */
     .tooltip-container:hover .tooltip-text,
     .tooltip-container:focus .tooltip-text {
       visibility: visible;
       opacity: 1;
-      transform: translateX(-50%) translateY(-2px);
+      transform: translateX(-50%) translateY(0);
     }
 
     /* Сетка вариантов ответа */
@@ -253,8 +275,8 @@
         <div>Правильно: <span id="correct-count" class="score-val">0</span></div>
       </div>
       
-      <div class="theme-indicator" id="current-theme">Loading...</div>
-      <div class="question-box" id="question-text">Creating the first challenge...</div>
+      <div class="theme-indicator" id="current-theme">Загрузка...</div>
+      <div class="question-box" id="question-text">Создаем задание...</div>
       
       <div class="options-grid" id="options-container">
         <!-- Кнопки сгенерируются автоматически -->
@@ -267,7 +289,7 @@
   </footer>
 
   <script>
-    // --- ЭФФЕКТ КОНФЕТТИ (CANVAS) ---
+    // --- ЭФФЕКТ КОНФЕТТИ ---
     const canvas = document.getElementById('confetti-canvas');
     const ctx = canvas.getContext('2d');
     let confetti = [];
@@ -326,73 +348,134 @@
       }
     }
 
-    // --- БАЗА ЗАДАНИЙ С ПОДСКАЗКАМИ-ПЕРЕВОДАМИ (50 ВОПРОСОВ) ---
+    // --- ВСТРОЕННЫЙ СЛОВАРЬ ДЛЯ АВТОМАТИЧЕСКОГО ПЕРЕВОДА ЛЮБОГО СЛОВА ---
+    const dictionary = {
+      // Местоимения и базовые слова
+      "i": "Я", "you": "ты / вы", "he": "он", "she": "она", "it": "оно / это",
+      "we": "мы", "they": "они", "my": "мой / моя", "your": "твой / ваш",
+      "our": "наш", "their": "их", "any": "какие-либо", "no": "нет", "not": "не",
+      "a": "артикль (один)", "an": "артикль (перед гласной)", "the": "артикль (конкретный)",
+      "this": "этот", "these": "эти", "that": "тот", "those": "те",
+      "who": "кто", "what": "что / какой", "where": "где / куда", "why": "почему",
+
+      // Глаголы и грамматика
+      "am": "есть (для I)", "is": "есть (для he/she/it)", "are": "есть (для we/you/they)",
+      "have": "иметь", "has": "имеет", "got": "получил (в составе 'иметь')",
+      "do": "делать (вспом. глагол)", "does": "делать (для he/she/it)",
+      "go": "идти / ехать", "goes": "идти (для he/she/it)", "play": "играть",
+      "plays": "играть (для he/she/it)", "like": "нравиться", "likes": "нравится",
+      "drink": "пить", "drinkes": "пьет", "speak": "говорить", "speaks": "говорит",
+      "live": "жить", "rises": "восходит", "visit": "посещать", "visits": "посещает",
+      "drive": "водить (машину)", "love": "любить", "loves": "любит",
+      "look": "смотри", "listen": "слушай", "write": "писать", "writing": "пишут (сейчас)",
+      "read": "читать", "reading": "читает (сейчас)", "watch": "смотреть",
+      "watching": "смотрят (сейчас)", "cry": "плакать", "crying": "плачет (сейчас)",
+      "rain": "дождь", "raining": "идет дождь (сейчас)", "flying": "летят (сейчас)",
+      "singing": "поет (сейчас)", "doing": "делает (сейчас)", "take": "возьми",
+
+      // Существительные и прилагательные
+      "brave": "смелый", "pirate": "пират", "best": "лучший", "friend": "друг",
+      "happy": "счастливый", "family": "семья", "ready": "готовый", "game": "игра",
+      "cute": "милый", "puppy": "щенок", "under": "под", "bed": "кровать",
+      "toys": "игрушки", "box": "коробка", "sunny": "солнечный", "day": "день",
+      "today": "сегодня", "clever": "умный", "students": "ученики", "books": "книги",
+      "teacher": "учитель", "doctor": "доктор", "funny": "смешной", "cat": "кот",
+      "big": "большой", "red": "красный", "bicycle": "велосипед", "many": "много",
+      "ideas": "идеи", "code": "код", "elephant": "слон", "long": "длинный",
+      "nose": "нос", "sister": "сестра", "green": "зеленый", "apples": "яблоки",
+      "beautiful": "красивый", "garden": "сад", "computer": "компьютер",
+      "monsters": "монстры", "scary": "страшные", "teeth": "зубы", "headache": "головная боль",
+      "every": "каждый", "school": "школа", "on": "на", "foot": "нога (пешком)",
+      "ice": "лед", "cream": "крем (ice cream - мороженое)", "coffee": "кофе",
+      "very": "очень", "well": "хорошо", "english": "английский", "sun": "солнце",
+      "east": "восток", "often": "часто", "grandparents": "дедушка и бабушка",
+      "dad": "папа", "car": "машина", "milk": "молоко", "birds": "птицы",
+      "sky": "небо", "homework": "домашняя работа", "right": "прямо", "now": "сейчас",
+      "nice": "приятный", "song": "песня", "at": "в", "the": "артикль", "moment": "момент",
+      "movie": "фильм", "baby": "малыш", "outside": "снаружи / на улице", "umbrella": "зонтик",
+
+      // Тесты лексики (русские слова-вопросы не переводятся поштучно, для них сделаем исключение)
+      "как": "слово-вопрос", "переводится": "переводится", "слово": "слово", "выбери": "выбери",
+      "правильный": "правильный", "перевод": "перевод", "что": "что", "это": "это", "за": "за",
+      "часть": "часть", "тела": "тела", "найди": "найди", "лишнее": "лишнее", "в": "в",
+      "группе": "группе", "одежды": "одежды", "по-английски": "по-английски", "пишется": "пишется",
+      "cabbage": "капуста", "черепаха": "turtle", "thursday": "четверг", "сентябрь": "september",
+      "shoulders": "плечи", "kitchen": "кухня", "снежный": "snowy", "pineapple": "ананас",
+      "bread": "хлеб", "карандаш": "pencil"
+    };
+
+    // Функция перевода слова
+    function getTranslation(word) {
+      // Очищаем слово от знаков препинания для поиска в словаре
+      const cleanWord = word.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+      return dictionary[cleanWord] || "Перевод не найден";
+    }
+
+    // --- БАЗА ЗАДАНИЙ (Знак ___ показывает место пропуска) ---
     const questionDatabase = [
       // --- VERB TO BE ---
-      { q: "I {brave} a brave pirate.", options: ["am", "is", "are"], correct: "am", theme: "Verb TO BE", translation: "brave — смелый" },
-      { q: "She {best friend} my best friend.", options: ["is", "am", "are"], correct: "is", theme: "Verb TO BE", translation: "best friend — лучший друг" },
-      { q: "They {happy family} happy family.", options: ["are", "is", "am"], correct: "are", theme: "Verb TO BE", translation: "happy family — счастливая семья" },
-      { q: "{Ready} you ready for the game?", options: ["Are", "Is", "Am"], correct: "Are", theme: "Verb TO BE", translation: "ready — готовый" },
-      { q: "The cute puppy {under} under the bed.", options: ["is", "are", "am"], correct: "is", theme: "Verb TO BE", translation: "under — под" },
-      { q: "My toys {toys} in the box.", options: ["are", "is", "was"], correct: "are", theme: "Verb TO BE", translation: "toys — игрушки" },
-      { q: "It {sunny} a sunny day today.", options: ["is", "am", "are"], correct: "is", theme: "Verb TO BE", translation: "sunny — солнечный" },
-      { q: "We {clever} clever students.", options: ["are", "is", "am"], correct: "are", theme: "Verb TO BE", translation: "clever — умные" },
-      { q: "Where {books} my books?", options: ["are", "is", "am"], correct: "are", theme: "Verb TO BE", translation: "books — книги" },
-      { q: "He {teacher} not a doctor, he is a teacher.", options: ["is", "are", "am"], correct: "is", theme: "Verb TO BE", translation: "teacher — учитель" },
+      { q: "I ___ a brave pirate.", options: ["am", "is", "are"], correct: "am", theme: "Verb TO BE" },
+      { q: "She ___ my best friend.", options: ["is", "am", "are"], correct: "is", theme: "Verb TO BE" },
+      { q: "They ___ a happy family.", options: ["are", "is", "am"], correct: "are", theme: "Verb TO BE" },
+      { q: "___ you ready for the game?", options: ["Are", "Is", "Am"], correct: "Are", theme: "Verb TO BE" },
+      { q: "The cute puppy ___ under the bed.", options: ["is", "are", "am"], correct: "is", theme: "Verb TO BE" },
+      { q: "My toys ___ in the box.", options: ["are", "is", "was"], correct: "are", theme: "Verb TO BE" },
+      { q: "It ___ a sunny day today.", options: ["is", "am", "are"], correct: "is", theme: "Verb TO BE" },
+      { q: "We ___ clever students.", options: ["are", "is", "am"], correct: "are", theme: "Verb TO BE" },
+      { q: "Where ___ my books?", options: ["are", "is", "am"], correct: "are", theme: "Verb TO BE" },
+      { q: "He ___ not a doctor, he is a teacher.", options: ["is", "are", "am"], correct: "is", theme: "Verb TO BE" },
 
       // --- HAVE GOT / HAS GOT ---
-      { q: "I {funny cat} a funny cat.", options: ["have got", "has got"], correct: "have got", theme: "Have got / Has got", translation: "funny cat — смешной кот" },
-      { q: "Tim {bicycle} a big red bicycle.", options: ["has got", "have got"], correct: "has got", theme: "Have got / Has got", translation: "bicycle — велосипед" },
-      { q: "We {many ideas} many ideas for our code.", options: ["have got", "has got"], correct: "have got", theme: "Have got / Has got", translation: "many ideas — много идей" },
-      { q: "An elephant {long nose} a very long nose.", options: ["has got", "have got"], correct: "has got", theme: "Have got / Has got", translation: "long nose — длинный нос" },
-      { q: "{Sister} you got a sister?", options: ["Have", "Has"], correct: "Have", theme: "Have got / Has got", translation: "sister — сестра" },
-      { q: "She {green apples} got any green apples.", options: ["hasn't", "haven't"], correct: "hasn't", theme: "Have got / Has got", translation: "green apples — зеленые яблоки" },
-      { q: "They {garden} a beautiful garden.", options: ["have got", "has got"], correct: "have got", theme: "Have got / Has got", translation: "garden — сад" },
-      { q: "{Computer} she got a computer?", options: ["Has", "Have"], correct: "Has", theme: "Have got / Has got", translation: "computer — компьютер" },
-      { q: "My monsters {teeth} got scary teeth.", options: ["have", "has"], correct: "have", theme: "Have got / Has got", translation: "teeth — зубы" },
-      { q: "He {headache} got a headache today.", options: ["has", "have"], correct: "has", theme: "Have got / Has got", translation: "headache — головная боль" },
+      { q: "I ___ a funny cat.", options: ["have got", "has got"], correct: "have got", theme: "Have got / Has got" },
+      { q: "Tim ___ a big red bicycle.", options: ["has got", "have got"], correct: "has got", theme: "Have got / Has got" },
+      { q: "We ___ many ideas for our code.", options: ["have got", "has got"], correct: "have got", theme: "Have got / Has got" },
+      { q: "An elephant ___ a very long nose.", options: ["has got", "have got"], correct: "has got", theme: "Have got / Has got" },
+      { q: "___ you got a sister?", options: ["Have", "Has"], correct: "Have", theme: "Have got / Has got" },
+      { q: "She ___ got any green apples.", options: ["hasn't", "haven't"], correct: "hasn't", theme: "Have got / Has got" },
+      { q: "They ___ a beautiful garden.", options: ["have got", "has got"], correct: "have got", theme: "Have got / Has got" },
+      { q: "___ she got a computer?", options: ["Has", "Have"], correct: "Has", theme: "Have got / Has got" },
+      { q: "My monsters ___ got scary teeth.", options: ["have", "has"], correct: "have", theme: "Have got / Has got" },
+      { q: "He ___ got a headache today.", options: ["has", "have"], correct: "has", theme: "Have got / Has got" },
 
       // --- PRESENT SIMPLE ---
-      { q: "He {every day} computer games every day.", options: ["plays", "play", "playing"], correct: "plays", theme: "Present Simple", translation: "every day — каждый день" },
-      { q: "They {on foot} to school on foot.", options: ["go", "goes", "going"], correct: "go", theme: "Present Simple", translation: "on foot — пешком" },
-      { q: "{Ice cream} you like ice cream?", options: ["Do", "Does", "Are"], correct: "Do", theme: "Present Simple", translation: "ice cream — мороженое" },
-      { q: "She {coffee} not drink coffee.", options: ["does", "do", "is"], correct: "does", theme: "Present Simple", translation: "coffee — кофе" },
-      { q: "My sister {very well} English very well.", options: ["speaks", "speak", "speaking"], correct: "speaks", theme: "Present Simple", translation: "very well — очень хорошо" },
-      { q: "Where {live} they live?", options: ["do", "does", "are"], correct: "do", theme: "Present Simple", translation: "live — жить" },
-      { q: "The sun {sun} in the east.", options: ["rises", "rise", "rising"], correct: "rises", theme: "Present Simple", translation: "sun — солнце" },
-      { q: "We often {grandparents} our grandparents.", options: ["visit", "visits", "visiting"], correct: "visit", theme: "Present Simple", translation: "grandparents — бабушка и дедушка" },
-      { q: "{Drive} your dad drive a car?", options: ["Does", "Do", "Is"], correct: "Does", theme: "Present Simple", translation: "drive — водить" },
-      { q: "Cats {love} milk.", options: ["love", "loves", "loving"], correct: "love", theme: "Present Simple", translation: "love — любить" },
+      { q: "He ___ computer games every day.", options: ["plays", "play", "playing"], correct: "plays", theme: "Present Simple" },
+      { q: "They ___ to school on foot.", options: ["go", "goes", "going"], correct: "go", theme: "Present Simple" },
+      { q: "___ you like ice cream?", options: ["Do", "Does", "Are"], correct: "Do", theme: "Present Simple" },
+      { q: "She ___ not drink coffee.", options: ["does", "do", "is"], correct: "does", theme: "Present Simple" },
+      { q: "My sister ___ English very well.", options: ["speaks", "speak", "speaking"], correct: "speaks", theme: "Present Simple" },
+      { q: "Where ___ they live?", options: ["do", "does", "are"], correct: "do", theme: "Present Simple" },
+      { q: "The sun ___ in the east.", options: ["rises", "rise", "rising"], correct: "rises", theme: "Present Simple" },
+      { q: "We often ___ our grandparents.", options: ["visit", "visits", "visiting"], correct: "visit", theme: "Present Simple" },
+      { q: "___ your dad drive a car?", options: ["Does", "Do", "Is"], correct: "Does", theme: "Present Simple" },
+      { q: "Cats ___ milk.", options: ["love", "loves", "loving"], correct: "love", theme: "Present Simple" },
 
       // --- PRESENT CONTINUOUS ---
-      { q: "Look! The birds {sky} in the sky.", options: ["are flying", "is flying", "fly"], correct: "are flying", theme: "Present Continuous", translation: "sky — небо" },
-      { q: "I {homework} my homework right now.", options: ["am doing", "is doing", "do"], correct: "am doing", theme: "Present Continuous", translation: "homework — домашняя работа" },
-      { q: "Listen! She {song} a nice song.", options: ["is singing", "are singing", "sings"], correct: "is singing", theme: "Present Continuous", translation: "song — песня" },
-      { q: "{At the moment} they writing a code at the moment?", options: ["Are", "Is", "Do"], correct: "Are", theme: "Present Continuous", translation: "at the moment — в данный момент" },
-      { q: "He {sleeping} not sleeping, he is reading.", options: ["is", "are", "am"], correct: "is", theme: "Present Continuous", translation: "sleeping — спит" },
-      { q: "What {drawing} you drawing now?", options: ["are", "is", "do"], correct: "are", theme: "Present Continuous", translation: "drawing — рисуешь" },
-      { q: "We {funny movie} a funny movie at the moment.", options: ["are watching", "is watching", "watch"], correct: "are watching", theme: "Present Continuous", translation: "funny movie — смешной фильм" },
-      { q: "The baby {crying} in the bed right now.", options: ["is crying", "are crying", "cries"], correct: "is crying", theme: "Present Continuous", translation: "crying — плачет" },
-      { q: "It {outside} outside. Take your umbrella!", options: ["is raining", "are raining", "rains"], correct: "is raining", theme: "Present Continuous", translation: "outside — на улице" },
-      { q: "Why {crying} she crying?", options: ["is", "are", "do"], correct: "is", theme: "Present Continuous", translation: "crying — плачет" },
+      { q: "Look! The birds ___ in the sky.", options: ["are flying", "is flying", "fly"], correct: "are flying", theme: "Present Continuous" },
+      { q: "I ___ my homework right now.", options: ["am doing", "is doing", "do"], correct: "am doing", theme: "Present Continuous" },
+      { q: "Listen! She ___ a nice song.", options: ["is singing", "are singing", "sings"], correct: "is singing", theme: "Present Continuous" },
+      { q: "___ they writing a code at the moment?", options: ["Are", "Is", "Do"], correct: "Are", theme: "Present Continuous" },
+      { q: "He ___ not sleeping, he is reading.", options: ["is", "are", "am"], correct: "is", theme: "Present Continuous" },
+      { q: "What ___ you drawing now?", options: ["are", "is", "do"], correct: "are", theme: "Present Continuous" },
+      { q: "We ___ a funny movie at the moment.", options: ["are watching", "is watching", "watch"], correct: "are watching", theme: "Present Continuous" },
+      { q: "The baby ___ in the bed right now.", options: ["is crying", "are crying", "cries"], correct: "is crying", theme: "Present Continuous" },
+      { q: "It ___ outside. Take your umbrella!", options: ["is raining", "are raining", "rains"], correct: "is raining", theme: "Present Continuous" },
+      { q: "Why ___ she crying?", options: ["is", "are", "do"], correct: "is", theme: "Present Continuous" },
 
       // --- VOCABULARY ---
-      { q: "Как переводится слово: {Cabbage}?", options: ["Капуста", "Огурец", "Тыква", "Морковь"], correct: "Капуста", theme: "Vocabulary", translation: "Просто наведи на варианты!" },
-      { q: "Выбери перевод слова: {Черепаха}?", options: ["Turtle", "Frog", "Lizard", "Spider"], correct: "Turtle", theme: "Vocabulary", translation: "Подсказка в вариантах :)" },
-      { q: "Как переводится слово: {Thursday}?", options: ["Четверг", "Вторник", "Суббота", "Пятница"], correct: "Четверг", theme: "Vocabulary", translation: "Один из дней недели!" },
-      { q: "Выбери правильный перевод: {Сентябрь}?", options: ["September", "October", "November", "December"], correct: "September", theme: "Vocabulary", translation: "Первый осенний месяц" },
-      { q: "Что это за часть тела: {Shoulders}?", options: ["Плечи", "Колени", "Пальцы", "Локти"], correct: "Плечи", theme: "Vocabulary", translation: "Часть тела выше груди" },
-      { q: "Как переводится: {Kitchen}?", options: ["Кухня", "Спальня", "Гостиная", "Ванная"], correct: "Кухня", theme: "Vocabulary", translation: "Место, где готовят еду" },
-      { q: "Выбери слово, означающее {Снежный}?", options: ["Snowy", "Rainy", "Windy", "Sunny"], correct: "Snowy", theme: "Vocabulary", translation: "Когда на улице много снега" },
-      { q: "Как переводится слово: {Pineapple}?", options: ["Ананас", "Яблоко", "Груша", "Апельсин"], correct: "Ананас", theme: "Vocabulary", translation: "Pine (сосна) + Apple (яблоко)" },
-      { q: "Найди лишнее слово в группе одежды: {Bread}?", options: ["Bread", "T-shirt", "Jeans", "Jacket"], correct: "Bread", theme: "Vocabulary", translation: "Это точно едят, а не носят!" },
-      { q: "Как по-английски пишется {Карандаш}?", options: ["Pencil", "Pen", "Ruler", "Book"], correct: "Pencil", theme: "Vocabulary", translation: "Им часто рисуют в школе" }
+      { q: "Как переводится слово: ___ (Cabbage)?", options: ["Капуста", "Огурец", "Тыква", "Морковь"], correct: "Капуста", theme: "Vocabulary" },
+      { q: "Выбери перевод слова: ___ (Черепаха)?", options: ["Turtle", "Frog", "Lizard", "Spider"], correct: "Turtle", theme: "Vocabulary" },
+      { q: "Как переводится слово: ___ (Thursday)?", options: ["Четверг", "Вторник", "Суббота", "Пятница"], correct: "Четверг", theme: "Vocabulary" },
+      { q: "Выбери правильный перевод: ___ (Сентябрь)?", options: ["September", "October", "November", "December"], correct: "September", theme: "Vocabulary" },
+      { q: "Что это за часть тела: ___ (Shoulders)?", options: ["Плечи", "Колени", "Пальцы", "Локти"], correct: "Плечи", theme: "Vocabulary" },
+      { q: "Как переводится: ___ (Kitchen)?", options: ["Кухня", "Спальня", "Гостиная", "Ванная"], correct: "Кухня", theme: "Vocabulary" },
+      { q: "Выбери слово, означающее ___ (Снежный)?", options: ["Snowy", "Rainy", "Windy", "Sunny"], correct: "Snowy", theme: "Vocabulary" },
+      { q: "Как переводится слово: ___ (Pineapple)?", options: ["Ананас", "Яблоко", "Груша", "Апельсин"], correct: "Ананас", theme: "Vocabulary" },
+      { q: "Найди лишнее слово в группе одежды: ___ (Bread)?", options: ["Bread", "T-shirt", "Jeans", "Jacket"], correct: "Bread", theme: "Vocabulary" },
+      { q: "Как по-английски пишется ___ (Карандаш)?", options: ["Pencil", "Pen", "Ruler", "Book"], correct: "Pencil", theme: "Vocabulary" }
     ];
 
-    // --- УМНЫЙ АЛГОРИТМ ПЕРЕМЕШИВАНИЯ (ФИШЕР-ЙЕТС) ---
     let shuffledQueue = [];
     let queueIndex = 0;
-    
     let scoreTotal = 0;
     let scoreCorrect = 0;
     let currentQuestion = null;
@@ -412,18 +495,30 @@
       generateQuestion();
     }
 
-    // Вспомогательная функция для форматирования вопроса с тултипом
-    // Находит в строке фигурные скобки {слово} и превращает их в интерактивный тултип
-    function formatQuestionText(text, translation) {
-      const regex = /\{([^}]+)\}/g;
-      return text.replace(regex, (match, word) => {
+    // РАЗБИВАЕТ ПРЕДЛОЖЕНИЕ НА СЛОВА И ОБОРАЧИВАЕТ КАЖДОЕ В ТУЛТИП С ПЕРЕВОДОМ
+    function formatTextWithInteractiveWords(text) {
+      const words = text.split(" ");
+      return words.map(word => {
+        // Если это пропуск, возвращаем красивую заглушку
+        if (word === "___") {
+          return `<span class="gap-placeholder">?</span>`;
+        }
+        
+        const cleanWordForDict = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+        const translation = getTranslation(cleanWordForDict);
+
+        // Если перевод не найден (например, знаки препинания), оставляем просто текст
+        if (translation === "Перевод не найден" || !cleanWordForDict) {
+          return `<span>${word}</span>`;
+        }
+
         return `
           <span class="tooltip-container" tabindex="0">
             <span class="highlight-word">${word}</span>
             <span class="tooltip-text">${translation}</span>
           </span>
         `;
-      });
+      }).join(" ");
     }
 
     function generateQuestion() {
@@ -435,12 +530,11 @@
       currentQuestion = shuffledQueue[queueIndex];
       queueIndex++;
 
-      // Заполнение данных
       document.getElementById('current-theme').textContent = currentQuestion.theme;
       
-      // Форматируем текст вопроса, внедряя тултип на место фигурных скобок
-      const formattedText = formatQuestionText(currentQuestion.q, currentQuestion.translation);
-      document.getElementById('question-text').innerHTML = formattedText;
+      // Генерация текста с интерактивным переводом слов
+      const formattedHTML = formatTextWithInteractiveWords(currentQuestion.q);
+      document.getElementById('question-text').innerHTML = formattedHTML;
 
       const container = document.getElementById('options-container');
       container.innerHTML = '';

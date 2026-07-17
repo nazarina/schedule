@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тренажер по русскому языку</title>
+  <style>
+    :root {
+      --bg-color: #fff0f3; /* Нежно-розовый фон */
+      --main-teal: #008080; /* Морская волна */
+      --dark-teal: #005a5a;
+      --light-teal: #e6f2f2;
+      --burgundy: #800000; /* Бордовый для акцентов */
+      --burgundy-hover: #b30000;
+      --text-main: #4a4a4a;
+      --white: #ffffff;
+      --wrong-flash: rgba(214, 48, 49, 0.4); /* Вспышка при ошибке */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease;
+    }
+
+    body.wrong-answer {
+      background-color: var(--wrong-flash);
+    }
+
+    /* Шапка с логотипом */
+    header {
+      width: 100%;
+      padding: 20px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      max-width: 1000px;
+    }
+
+    .logo-placeholder {
+      width: 150px;
+      height: 50px;
+      border: 2px dashed var(--main-teal);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--main-teal);
+      font-weight: bold;
+      background-color: var(--white);
+    }
+
+    /* Основной контейнер */
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 650px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 128, 128, 0.1);
+      border-top: 5px solid var(--main-teal);
+      text-align: center;
+    }
+
+    h2 {
+      color: var(--main-teal);
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
+
+    /* Выбор тем */
+    .selector-column {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 30px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .checkbox-container {
+      position: relative;
+      display: block;
+    }
+
+    .checkbox-container input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+
+    .checkmark {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 15px 20px;
+      background-color: var(--light-teal);
+      border: 2px solid var(--main-teal);
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--main-teal);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .checkbox-container input:checked ~ .checkmark {
+      background-color: var(--main-teal);
+      color: var(--white);
+    }
+
+    /* Кнопки действий */
+    .btn {
+      background: linear-gradient(to top, var(--burgundy) 0%, #d63031 100%);
+      color: var(--white);
+      border: none;
+      padding: 14px 35px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.1s ease, opacity 0.2s ease;
+      box-shadow: 0 4px 15px rgba(128, 0, 0, 0.3);
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Счётчик результатов */
+    .score-board {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 25px;
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--text-main);
+    }
+
+    .score-val {
+      color: var(--burgundy);
+    }
+
+    /* Игровой экран */
+    .game-screen {
+      display: none;
+    }
+
+    .theme-indicator {
+      display: inline-block;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background-color: var(--light-teal);
+      color: var(--main-teal);
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    .question-box {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--text-main);
+      margin: 25px 0;
+      line-height: 1.4;
+    }
+
+    .highlight-word {
+      color: var(--burgundy);
+      border-bottom: 3px dashed var(--burgundy);
+      padding-bottom: 2px;
+    }
+
+    /* Сетка вариантов ответа */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .option-btn {
+      background-color: var(--white);
+      border: 2px solid var(--main-teal);
+      color: var(--main-teal);
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-btn:hover {
+      background-color: var(--main-teal);
+      color: var(--white);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 128, 128, 0.15);
+    }
+
+    .option-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Canvas для конфетти */
+    #confetti-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Подвал */
+    footer {
+      width: 100%;
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: var(--main-teal);
+      font-weight: 500;
+    }
+
+    @media (max-width: 500px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+      .question-box {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <header>
+    <div class="logo-placeholder">Логотип</div>
+  </header>
+
+  <main>
+    <!-- ЭКРАН 1: Настройка тем -->
+    <div id="setup-screen" class="card">
+      <h2>Выберите темы для тренировки:</h2>
+      <div class="selector-column">
+        <label class="checkbox-container">
+          <input type="checkbox" value="cases" class="theme-checkbox" checked>
+          <span class="checkmark">📌 Падежи (укажи падеж слова)</span>
+        </label>
+        <label class="checkbox-container">
+          <input type="checkbox" value="parts" class="theme-checkbox" checked>
+          <span class="checkmark">🏷️ Части речи (определи часть речи)</span>
+        </label>
+        <label class="checkbox-container">
+          <input type="checkbox" value="grammar" class="theme-checkbox" checked>
+          <span class="checkmark">✍️ Орфограммы (вставь букву)</span>
+        </label>
+      </div>
+      <button class="btn" onclick="startTrainer()">Начать тренировку</button>
+    </div>
+
+    <!-- ЭКРАН 2: Игровой процесс -->
+    <div id="trainer-screen" class="card game-screen">
+      <div class="score-board">
+        <div>Решено: <span id="total-count" class="score-val">0</span></div>
+        <div>Правильно: <span id="correct-count" class="score-val">0</span></div>
+      </div>
+      
+      <div class="theme-indicator" id="current-theme">Тема</div>
+      <div class="question-box" id="question-text">Загрузка вопроса...</div>
+      
+      <div class="options-grid" id="options-container">
+        <!-- Кнопки вариантов будут генерироваться динамически -->
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Мастерская IT-обучения "Кот и Код"
+  </footer>
+
+  <script>
+    // --- ЭФФЕКТ КОНФЕТТИ (CANVAS) ---
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let confetti = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class ConfettiParticle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + Math.random() * 20;
+        this.size = Math.random() * 6 + 4;
+        this.speedX = Math.random() * 4 - 2;
+        this.speedY = -(Math.random() * 8 + 6);
+        this.color = `hsl(${Math.random() * 360}, 80%, 60%)`;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.speedY += 0.2;
+      }
+      draw() {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function triggerConfetti() {
+      confetti = [];
+      for (let i = 0; i < 70; i++) {
+        confetti.push(new ConfettiParticle());
+      }
+      animateConfetti();
+    }
+
+    let animationFrame;
+    function animateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach((p, index) => {
+        p.update();
+        p.draw();
+        if (p.y > canvas.height + 10) {
+          confetti.splice(index, 1);
+        }
+      });
+      if (confetti.length > 0) {
+        animationFrame = requestAnimationFrame(animateConfetti);
+      } else {
+        cancelAnimationFrame(animationFrame);
+      }
+    }
+
+    // --- БАЗА ВОПРОСОВ ---
+    const database = {
+      cases: [
+        { q: "Определи падеж: Радоваться <span class='highlight-word'>весне</span>", options: ["Дательный", "Творительный", "Родительный", "Предложный"], correct: "Дательный" },
+        { q: "Определи падеж: Написать в <span class='highlight-word'>тетради</span>", options: ["Предложный", "Дательный", "Родительный", "Винительный"], correct: "Предложный" },
+        { q: "Определи падеж: Гордиться <span class='highlight-word'>победой</span>", options: ["Творительный", "Именительный", "Дательный", "Родительный"], correct: "Творительный" },
+        { q: "Определи падеж: Нет <span class='highlight-word'>времени</span>", options: ["Родительный", "Дательный", "Винительный", "Именительный"], correct: "Родительный" },
+        { q: "Определи падеж: Вижу <span class='highlight-word'>солнце</span>", options: ["Винительный", "Именительный", "Родительный", "Творительный"], correct: "Винительный" }
+      ],
+      parts: [
+        { q: "Какая часть речи: <span class='highlight-word'>Бежать</span>", options: ["Глагол", "Существительное", "Прилагательное", "Местоимение"], correct: "Глагол" },
+        { q: "Какая часть речи: <span class='highlight-word'>Красивый</span>", options: ["Прилагательное", "Существительное", "Глагол", "Наречие"], correct: "Прилагательное" },
+        { q: "Какая часть речи: <span class='highlight-word'>Радость</span>", options: ["Существительное", "Прилагательное", "Глагол", "Предлог"], correct: "Существительное" },
+        { q: "Какая часть речи: <span class='highlight-word'>Быстро</span>", options: ["Наречие", "Глагол", "Прилагательное", "Существительное"], correct: "Наречие" },
+        { q: "Какая часть речи: <span class='highlight-word'>Я</span>", options: ["Местоимение", "Существительное", "Союз", "Предлог"], correct: "Местоимение" }
+      ],
+      grammar: [
+        { q: "Вставь букву: ш..рокий", options: ["и", "ы"], correct: "и" },
+        { q: "Вставь букву: со(?)нце", options: ["л", "Без буквы"], correct: "л" },
+        { q: "Вставь букву: прелес(?)ный", options: ["т", "Без буквы"], correct: "т" },
+        { q: "Вставь букву: зв..зда", options: ["е", "и"], correct: "е" },
+        { q: "Вставь букву: ду(б/п)?", options: ["б", "п"], correct: "б" },
+        { q: "Вставь букву: под..езд", options: ["ъ", "ь"], correct: "ъ" }
+      ]
+    };
+
+    // --- ЛОГИКА ТРЕНАЖЕРА ---
+    let activePool = [];
+    let scoreTotal = 0;
+    let scoreCorrect = 0;
+    let currentQuestion = null;
+
+    function startTrainer() {
+      const checkedBoxes = document.querySelectorAll('.theme-checkbox:checked');
+      activePool = [];
+
+      checkedBoxes.forEach(cb => {
+        const theme = cb.value;
+        // Помечаем каждый вопрос темой для индикатора
+        const taggedQuestions = database[theme].map(item => ({ ...item, themeName: getThemeLabel(theme) }));
+        activePool = activePool.concat(taggedQuestions);
+      });
+
+      if (activePool.length === 0) {
+        alert("Пожалуйста, выберите хотя бы одну тему для тренировки!");
+        return;
+      }
+
+      document.getElementById('setup-screen').style.display = 'none';
+      document.getElementById('trainer-screen').style.display = 'block';
+      generateQuestion();
+    }
+
+    function getThemeLabel(themeKey) {
+      switch(themeKey) {
+        case 'cases': return 'Падежи';
+        case 'parts': return 'Части речи';
+        case 'grammar': return 'Орфограммы';
+        default: return 'Общее';
+      }
+    }
+
+    function generateQuestion() {
+      // Выбираем случайный вопрос из активного пула
+      currentQuestion = activePool[Math.floor(Math.random() * activePool.length)];
+
+      document.getElementById('current-theme').textContent = currentQuestion.themeName;
+      document.getElementById('question-text').innerHTML = currentQuestion.q;
+
+      const container = document.getElementById('options-container');
+      container.innerHTML = '';
+
+      // Создаем кнопки вариантов ответа
+      currentQuestion.options.forEach(option => {
+        const button = document.createElement('button');
+        button.className = 'option-btn';
+        button.textContent = option;
+        button.onclick = () => checkAnswer(option);
+        container.appendChild(button);
+      });
+    }
+
+    function checkAnswer(selectedOption) {
+      scoreTotal++;
+
+      if (selectedOption === currentQuestion.correct) {
+        scoreCorrect++;
+        triggerConfetti();
+      } else {
+        document.body.classList.add('wrong-answer');
+        setTimeout(() => {
+          document.body.classList.remove('wrong-answer');
+        }, 500);
+      }
+
+      // Обновляем статистику
+      document.getElementById('total-count').textContent = scoreTotal;
+      document.getElementById('correct-count').textContent = scoreCorrect;
+
+      // Сразу переходим к следующему вопросу
+      generateQuestion();
+    }
+  </script>
+</body>
+</html>

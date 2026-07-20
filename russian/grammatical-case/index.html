@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">И.
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Тренажёр: Падежи русского языка | Кот и Код</title>
     <!-- Tailwind CSS для стильной верстки -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -61,7 +61,7 @@
                 </button>
 
                 <div class="w-16 h-16 mx-auto mb-2 bg-teal-50 rounded-2xl flex items-center justify-center border-2 border-[var(--main-teal)] shadow-sm">
-                  <!--  <i class="fa-solid fa-cat text-3xl text-[var(--main-teal)]"></i>-->
+                   <!-- <i class="fa-solid fa-cat text-3xl text-[var(--main-teal)]"></i>-->
                     <img src="../logo.png">
                 </div>
                 <h1 class="text-lg font-extrabold text-gray-800 tracking-tight">Кот и Код</h1>
@@ -83,18 +83,19 @@
             <!-- Форма с падежами -->
             <div class="space-y-3" id="cases-list">
                 
-                <!-- Именительный (Всегда заполнен) -->
-                <div class="grid grid-cols-12 gap-2 items-center bg-gray-50/70 p-3 rounded-xl border border-gray-100">
-                    <div class="col-span-4 font-bold text-xs text-teal-900">Именительный падеж <span class="font-normal text-gray-400 block text-[10px]">(есть)</span></div>
+                <!-- Именительный падеж (Теперь активен!) -->
+                <div class="grid grid-cols-12 gap-2 items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="col-span-4 font-bold text-xs text-teal-900">Именительный <span class="font-normal text-gray-400 block text-[10px]">(есть)</span></div>
                     <div class="col-span-3 text-[11px] text-gray-500 font-medium">кто? что?</div>
-                    <div class="col-span-5">
-                        <input type="text" id="p-nom" disabled class="w-full bg-gray-200/60 text-gray-600 text-sm font-bold py-2 px-3 rounded-xl border border-gray-200 text-center cursor-not-allowed">
+                    <div class="col-span-5 relative">
+                        <input type="text" id="p-nom" placeholder="..." autocomplete="off" class="w-full text-sm font-semibold py-2 px-3 rounded-xl border border-gray-300 text-center focus:outline-none focus:border-[var(--main-teal)] focus:ring-2 focus:ring-teal-100 transition-all-custom">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs hidden" id="icon-p-nom"></span>
                     </div>
                 </div>
 
-                <!-- Родительный -->
+                <!-- Родительный падеж -->
                 <div class="grid grid-cols-12 gap-2 items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                    <div class="col-span-4 font-bold text-xs text-teal-900">Родительный падеж <span class="font-normal text-gray-400 block text-[10px]">(нет)</span></div>
+                    <div class="col-span-4 font-bold text-xs text-teal-900">Родительный <span class="font-normal text-gray-400 block text-[10px]">(нет)</span></div>
                     <div class="col-span-3 text-[11px] text-gray-500 font-medium">кого? чего?</div>
                     <div class="col-span-5 relative">
                         <input type="text" id="p-rod" placeholder="..." autocomplete="off" class="w-full text-sm font-semibold py-2 px-3 rounded-xl border border-gray-300 text-center focus:outline-none focus:border-[var(--main-teal)] focus:ring-2 focus:ring-teal-100 transition-all-custom">
@@ -102,9 +103,9 @@
                     </div>
                 </div>
 
-                <!-- Дательный -->
+                <!-- Дательный падеж -->
                 <div class="grid grid-cols-12 gap-2 items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                    <div class="col-span-4 font-bold text-xs text-teal-900">Дательный падеж <span class="font-normal text-gray-400 block text-[10px]">(даю)</span></div>
+                    <div class="col-span-4 font-bold text-xs text-teal-900">Дательный <span class="font-normal text-gray-400 block text-[10px]">(рад)</span></div>
                     <div class="col-span-3 text-[11px] text-gray-500 font-medium">кому? чему?</div>
                     <div class="col-span-5 relative">
                         <input type="text" id="p-dat" placeholder="..." autocomplete="off" class="w-full text-sm font-semibold py-2 px-3 rounded-xl border border-gray-300 text-center focus:outline-none focus:border-[var(--main-teal)] focus:ring-2 focus:ring-teal-100 transition-all-custom">
@@ -112,9 +113,9 @@
                     </div>
                 </div>
 
-                <!-- Винительный -->
+                <!-- Винительный падеж -->
                 <div class="grid grid-cols-12 gap-2 items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                    <div class="col-span-4 font-bold text-xs text-teal-900">Винительный падеж <span class="font-normal text-gray-400 block text-[10px]">(вижу)</span></div>
+                    <div class="col-span-4 font-bold text-xs text-teal-900">Винительный <span class="font-normal text-gray-400 block text-[10px]">(вижу)</span></div>
                     <div class="col-span-3 text-[11px] text-gray-500 font-medium">кого? что?</div>
                     <div class="col-span-5 relative">
                         <input type="text" id="p-vin" placeholder="..." autocomplete="off" class="w-full text-sm font-semibold py-2 px-3 rounded-xl border border-gray-300 text-center focus:outline-none focus:border-[var(--main-teal)] focus:ring-2 focus:ring-teal-100 transition-all-custom">
@@ -122,9 +123,9 @@
                     </div>
                 </div>
 
-                <!-- Творительный -->
+                <!-- Творительный падеж -->
                 <div class="grid grid-cols-12 gap-2 items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                    <div class="col-span-4 font-bold text-xs text-teal-900">Творительный падеж <span class="font-normal text-gray-400 block text-[10px]">(доволен)</span></div>
+                    <div class="col-span-4 font-bold text-xs text-teal-900">Творительный <span class="font-normal text-gray-400 block text-[10px]">(доволен)</span></div>
                     <div class="col-span-3 text-[11px] text-gray-500 font-medium">кем? чем?</div>
                     <div class="col-span-5 relative">
                         <input type="text" id="p-tvor" placeholder="..." autocomplete="off" class="w-full text-sm font-semibold py-2 px-3 rounded-xl border border-gray-300 text-center focus:outline-none focus:border-[var(--main-teal)] focus:ring-2 focus:ring-teal-100 transition-all-custom">
@@ -132,9 +133,9 @@
                     </div>
                 </div>
 
-                <!-- Предложный -->
+                <!-- Предложный падеж -->
                 <div class="grid grid-cols-12 gap-2 items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                    <div class="col-span-4 font-bold text-xs text-teal-900">Предложный падеж <span class="font-normal text-gray-400 block text-[10px]">(думаю о)</span></div>
+                    <div class="col-span-4 font-bold text-xs text-teal-900">Предложный <span class="font-normal text-gray-400 block text-[10px]">(думаю о)</span></div>
                     <div class="col-span-3 text-[11px] text-gray-500 font-medium">о ком? о чём?</div>
                     <div class="col-span-5 relative">
                         <input type="text" id="p-pred" placeholder="..." autocomplete="off" class="w-full text-sm font-semibold py-2 px-3 rounded-xl border border-gray-300 text-center focus:outline-none focus:border-[var(--main-teal)] focus:ring-2 focus:ring-teal-100 transition-all-custom">
@@ -167,11 +168,12 @@
     </footer>
 
     <script>
-        // База слов с массивами допустимых ответов (чтобы покрыть варианты с предлогами и без)
+        // Обширная база слов с поддержкой предлогов, падежных вопросов и Именительного падежа
         const wordsDatabase = [
             {
                 nominative: "кот",
                 answers: {
+                    'p-nom': ["кот", "есть кот"],
                     'p-rod': ["кота", "у кота", "нет кота"],
                     'p-dat': ["коту", "к коту", "рад коту"],
                     'p-vin': ["кота", "вижу кота"],
@@ -182,6 +184,7 @@
             {
                 nominative: "книга",
                 answers: {
+                    'p-nom': ["книга", "есть книга"],
                     'p-rod': ["книги", "нет книги", "у книги"],
                     'p-dat': ["книге", "к книге", "рад книге"],
                     'p-vin': ["книгу", "вижу книгу"],
@@ -192,6 +195,7 @@
             {
                 nominative: "окно",
                 answers: {
+                    'p-nom': ["окно", "есть окно"],
                     'p-rod': ["окна", "нет окна", "из окна"],
                     'p-dat': ["окну", "к окну", "рад окну"],
                     'p-vin': ["окно", "вижу окно", "в окно"],
@@ -202,28 +206,164 @@
             {
                 nominative: "лиса",
                 answers: {
+                    'p-nom': ["лиса", "есть лиса"],
                     'p-rod': ["лисы", "нет лисы", "у лисы"],
                     'p-dat': ["лисе", "к лисе", "рад лисе"],
                     'p-vin': ["лису", "вижу лису"],
                     'p-tvor': ["лисой", "лисою", "с лисой", "доволен лисой"],
                     'p-pred': ["лисе", "о лисе", "думаю о лисе"]
                 }
+            },
+            {
+                nominative: "дом",
+                answers: {
+                    'p-nom': ["дом", "есть дом"],
+                    'p-rod': ["дома", "нет дома", "у дома"],
+                    'p-dat': ["дому", "к дому", "рад дому"],
+                    'p-vin': ["дом", "вижу дом", "в дом"],
+                    'p-tvor': ["домом", "доволен домом", "за домом", "под домом", "с домом"],
+                    'p-pred': ["доме", "о доме", "в доме", "на доме", "думаю о доме"]
+                }
+            },
+            {
+                nominative: "мама",
+                answers: {
+                    'p-nom': ["мама", "есть мама"],
+                    'p-rod': ["мамы", "нет мамы", "у мамы"],
+                    'p-dat': ["маме", "к маме", "рад маме"],
+                    'p-vin': ["маму", "вижу маму"],
+                    'p-tvor': ["мамой", "мамою", "с мамой", "доволен мамой"],
+                    'p-pred': ["маме", "о маме", "думаю о маме"]
+                }
+            },
+            {
+                nominative: "река",
+                answers: {
+                    'p-nom': ["река", "есть река"],
+                    'p-rod': ["реки", "нет реки", "у реки", "из реки"],
+                    'p-dat': ["реке", "к реке", "рад реке"],
+                    'p-vin': ["реку", "вижу реку", "в реку"],
+                    'p-tvor': ["рекой", "рекою", "с рекой", "доволен рекой", "за рекой"],
+                    'p-pred': ["реке", "о реке", "в реке", "на реке", "думаю о реке"]
+                }
+            },
+            {
+                nominative: "солнце",
+                answers: {
+                    'p-nom': ["солнце", "есть солнце"],
+                    'p-rod': ["солнца", "нет солнца", "из-за солнца"],
+                    'p-dat': ["солнцу", "к солнцу", "рад солнцу"],
+                    'p-vin': ["солнце", "вижу солнце", "на солнце"],
+                    'p-tvor': ["солнцем", "доволен солнцем", "под солнцем", "за солнцем"],
+                    'p-pred': ["солнце", "о солнце", "на солнце", "в солнце", "думаю о солнце"]
+                }
+            },
+            {
+                nominative: "мышь",
+                answers: {
+                    'p-nom': ["мышь", "есть мышь"],
+                    'p-rod': ["мыши", "нет мыши", "у мыши"],
+                    'p-dat': ["мыши", "к мыши", "рад мыши"],
+                    'p-vin': ["мышь", "вижу мышь"],
+                    'p-tvor': ["мышью", "доволен мышью", "с мышью"],
+                    'p-pred': ["мыши", "о мыши", "думаю о мыши"]
+                }
+            },
+            {
+                nominative: "мяч",
+                answers: {
+                    'p-nom': ["мяч", "есть мяч"],
+                    'p-rod': ["мяча", "нет мяча", "у мяча"],
+                    'p-dat': ["мячу", "к мячу", "рад мячу"],
+                    'p-vin': ["мяч", "вижу мяч", "в мяч"],
+                    'p-tvor': ["мячом", "доволен мячом", "с мячом", "за мячом"],
+                    'p-pred': ["мяче", "о мяче", "на мяче", "в мяче", "думаю о мяче"]
+                }
+            },
+            {
+                nominative: "собака",
+                answers: {
+                    'p-nom': ["собака", "есть собака"],
+                    'p-rod': ["собаки", "нет собаки", "у собаки"],
+                    'p-dat': ["собаке", "к собаке", "рад собаке"],
+                    'p-vin': ["собаку", "вижу собаку"],
+                    'p-tvor': ["собакой", "собакою", "доволен собакой", "с собакой"],
+                    'p-pred': ["собаке", "о собаке", "думаю о собаке"]
+                }
+            },
+            {
+                nominative: "дерево",
+                answers: {
+                    'p-nom': ["дерево", "есть дерево"],
+                    'p-rod': ["дерева", "нет дерева", "у дерева", "с дерева"],
+                    'p-dat': ["дереву", "к дереву", "рад дереву"],
+                    'p-vin': ["дерево", "вижу дерево", "в дерево"],
+                    'p-tvor': ["деревом", "доволен деревом", "под деревом", "за деревом"],
+                    'p-pred': ["дереве", "о дереве", "на дереве", "в дереве", "думаю о дереве"]
+                }
+            },
+            {
+                nominative: "тигр",
+                answers: {
+                    'p-nom': ["тигр", "есть тигр"],
+                    'p-rod': ["тигра", "нет тигра", "у тигра"],
+                    'p-dat': ["тигру", "к тигру", "рад тигру"],
+                    'p-vin': ["тигра", "вижу тигра"],
+                    'p-tvor': ["тигром", "доволен тигром", "с тигром"],
+                    'p-pred': ["тигре", "о тигре", "думаю о тигре"]
+                }
+            },
+            {
+                nominative: "друг",
+                answers: {
+                    'p-nom': ["друг", "есть друг"],
+                    'p-rod': ["друга", "нет друга", "у друга"],
+                    'p-dat': ["другу", "к другу", "рад другу"],
+                    'p-vin': ["друга", "вижу друга"],
+                    'p-tvor': ["другом", "доволен другом", "с другом"],
+                    'p-pred': ["друге", "о друге", "думаю о друге"]
+                }
+            },
+            {
+                nominative: "вода",
+                answers: {
+                    'p-nom': ["вода", "есть вода"],
+                    'p-rod': ["воды", "нет воды", "у воды", "из воды"],
+                    'p-dat': ["воде", "к воде", "рад воде"],
+                    'p-vin': ["воду", "вижу воду", "в воду"],
+                    'p-tvor': ["водой", "водою", "доволен водой", "с водой", "под водой"],
+                    'p-pred': ["воде", "о воде", "в воде", "на воде", "думаю о воде"]
+                }
             }
         ];
 
         let currentWordIndex = 0;
         let score = 0;
+        let unusedIndexes = [];
+
+        // Алгоритм Фишера-Йетса для бесповторного случайного выбора слов
+        function getNextWordIndex() {
+            if (unusedIndexes.length === 0) {
+                // Создаем пул индексов и перемешиваем его
+                unusedIndexes = Array.from({length: wordsDatabase.length}, (_, i) => i);
+                for (let i = unusedIndexes.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [unusedIndexes[i], unusedIndexes[j]] = [unusedIndexes[j], unusedIndexes[i]];
+                }
+            }
+            return unusedIndexes.pop();
+        }
 
         // Генерация победного звука через Web Audio API
         function playSuccessSound() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 
-                // Первая нота
+                // Первая нота (до)
                 const osc1 = ctx.createOscillator();
                 const gain1 = ctx.createGain();
                 osc1.type = 'sine';
-                osc1.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                osc1.frequency.setValueAtTime(523.25, ctx.currentTime);
                 osc1.connect(gain1);
                 gain1.connect(ctx.destination);
                 gain1.gain.setValueAtTime(0.1, ctx.currentTime);
@@ -231,12 +371,12 @@
                 osc1.start();
                 osc1.stop(ctx.currentTime + 0.3);
 
-                // Вторая гармоничная нота чуть позже
+                // Вторая гармоничная нота (ми) чуть позже
                 setTimeout(() => {
                     const osc2 = ctx.createOscillator();
                     const gain2 = ctx.createGain();
                     osc2.type = 'sine';
-                    osc2.frequency.setValueAtTime(659.25, ctx.currentTime); // E5
+                    osc2.frequency.setValueAtTime(659.25, ctx.currentTime);
                     osc2.connect(gain2);
                     gain2.connect(ctx.destination);
                     gain2.gain.setValueAtTime(0.1, ctx.currentTime);
@@ -245,12 +385,12 @@
                     osc2.stop(ctx.currentTime + 0.4);
                 }, 120);
 
-                // Третья финальная торжественная нота
+                // Третья финальная нота (соль)
                 setTimeout(() => {
                     const osc3 = ctx.createOscillator();
                     const gain3 = ctx.createGain();
                     osc3.type = 'sine';
-                    osc3.frequency.setValueAtTime(783.99, ctx.currentTime); // G5
+                    osc3.frequency.setValueAtTime(783.99, ctx.currentTime);
                     osc3.connect(gain3);
                     gain3.connect(ctx.destination);
                     gain3.gain.setValueAtTime(0.15, ctx.currentTime);
@@ -267,21 +407,20 @@
         function loadWord(index) {
             const data = wordsDatabase[index];
             document.getElementById('target-word').innerText = data.nominative;
-            document.getElementById('p-nom').value = data.nominative;
             
-            // Сброс полей ввода и стилей
-            const inputIds = ['p-rod', 'p-dat', 'p-vin', 'p-tvor', 'p-pred'];
+            // Сброс абсолютно всех полей ввода, включая Именительный падеж
+            const inputIds = ['p-nom', 'p-rod', 'p-dat', 'p-vin', 'p-tvor', 'p-pred'];
             inputIds.forEach(id => {
                 const input = document.getElementById(id);
                 input.value = "";
                 input.className = "w-full text-sm font-semibold py-2 px-3 rounded-xl border border-gray-300 text-center focus:outline-none focus:border-[var(--main-teal)] focus:ring-2 focus:ring-teal-100 transition-all-custom";
                 
-                // Прячем иконки статуса внутри полей
+                // Прячем иконки статуса
                 const icon = document.getElementById('icon-' + id);
                 icon.className = "absolute right-3 top-1/2 -translate-y-1/2 text-xs hidden";
             });
 
-            // Прячем кнопку "Дальше", показываем "Проверить"
+            // Настройка кнопок
             document.getElementById('btn-next').classList.add('hidden');
             document.getElementById('btn-check').classList.remove('hidden');
             document.getElementById('result-message').classList.add('hidden');
@@ -290,14 +429,14 @@
         // Проверка введённых ответов
         function checkAnswers() {
             const currentWord = wordsDatabase[currentWordIndex];
-            const inputIds = ['p-rod', 'p-dat', 'p-vin', 'p-tvor', 'p-pred'];
+            const inputIds = ['p-nom', 'p-rod', 'p-dat', 'p-vin', 'p-tvor', 'p-pred'];
             let allCorrect = true;
             let answeredCount = 0;
 
             inputIds.forEach(id => {
                 const input = document.getElementById(id);
                 const icon = document.getElementById('icon-' + id);
-                // Очищаем пробелы, приводим к нижнему регистру, заменяем буквы ё на е для удобства
+                // Очищаем лишние символы, приводим к нижнему регистру, заменяем ё на е
                 const val = input.value.trim().toLowerCase().replace(/ё/g, 'е');
 
                 if (val === "") {
@@ -310,16 +449,16 @@
 
                 answeredCount++;
 
-                // Сравниваем со списком корректных вариантов для этого падежа
+                // Сравниваем со списком верных ответов в базе
                 const possibleCorrect = currentWord.answers[id].map(ans => ans.toLowerCase().replace(/ё/g, 'е'));
                 
                 if (possibleCorrect.includes(val)) {
-                    // Ответ правильный!
+                    // Верно!
                     input.className = "w-full text-sm font-bold py-2 pl-3 pr-8 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 text-center transition-all-custom";
                     icon.innerHTML = "<i class='fa-solid fa-circle-check text-emerald-500'></i>";
                     icon.classList.remove('hidden');
                 } else {
-                    // Ошибка
+                    // Неверно
                     allCorrect = false;
                     input.className = "w-full text-sm font-bold py-2 pl-3 pr-8 rounded-xl border-2 border-rose-400 bg-rose-50 text-rose-800 text-center transition-all-custom";
                     icon.innerHTML = "<i class='fa-solid fa-circle-xmark text-rose-500'></i>";
@@ -332,16 +471,16 @@
 
             if (answeredCount < inputIds.length) {
                 resultBlock.className = "text-center p-4 rounded-2xl text-xs font-bold bg-amber-50 text-amber-800 border-amber-200 transition-all-custom";
-                resultBlock.innerHTML = "<i class='fa-solid fa-pen-nib mr-1.5'></i> Заполните все падежи, чтобы пройти проверку!";
+                resultBlock.innerHTML = "<i class='fa-solid fa-pen-nib mr-1.5'></i> Заполните все падежи (включая Именительный), чтобы проверить себя!";
             } else if (allCorrect) {
-                // Полная победа!
+                // Победа
                 score += 10;
                 document.getElementById('score-counter').innerHTML = `<i class="fa-solid fa-star text-amber-400 mr-1"></i>Очки: ${score}`;
                 
                 resultBlock.className = "text-center p-4 rounded-2xl text-xs font-bold bg-emerald-50 text-emerald-800 border-emerald-200 transition-all-custom";
-                resultBlock.innerHTML = "🎉 Ура! Все падежи раскрыты абсолютно верно! Ты супер!";
+                resultBlock.innerHTML = "🎉 Ура! Все падежные формы раскрыты абсолютно правильно! Ты умница!";
                 
-                // Запуск салюта конфетти
+                // Салют
                 confetti({
                     particleCount: 100,
                     spread: 70,
@@ -351,32 +490,34 @@
 
                 playSuccessSound();
 
-                // Показываем кнопку перехода к следующему слову
+                // Открываем переход дальше
                 document.getElementById('btn-check').classList.add('hidden');
                 document.getElementById('btn-next').classList.remove('hidden');
             } else {
                 resultBlock.className = "text-center p-4 rounded-2xl text-xs font-bold bg-rose-50 text-rose-800 border-rose-200 transition-all-custom";
-                resultBlock.innerHTML = "🧐 Ой, есть ошибки или пустые поля. Попробуй исправить подсвеченные строчки!";
+                resultBlock.innerHTML = "🧐 Кое-где закрались ошибки. Исправь поля, отмеченные красным крестиком!";
             }
         }
 
-        // Переход к следующему слову
+        // Переход к следующему неповторяющемуся слову
         function nextWord() {
-            currentWordIndex = (currentWordIndex + 1) % wordsDatabase.length;
+            currentWordIndex = getNextWordIndex();
             loadWord(currentWordIndex);
         }
 
-        // Сброс очков и старт с начала
+        // Сброс очков
         function resetGame() {
             score = 0;
             document.getElementById('score-counter').innerHTML = `<i class="fa-solid fa-star text-amber-400 mr-1"></i>Очки: ${score}`;
-            currentWordIndex = 0;
+            unusedIndexes = []; // Очищаем историю перемешивания
+            currentWordIndex = getNextWordIndex();
             loadWord(currentWordIndex);
         }
 
-        // Инициализация игры при загрузке страницы
+        // Старт игры
         window.onload = function() {
-            loadWord(0);
+            currentWordIndex = getNextWordIndex();
+            loadWord(currentWordIndex);
         }
     </script>
 </body>

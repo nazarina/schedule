@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажёр: Падежи русского языка | Кот и Код</title>
+    <!-- Tailwind CSS для стильной верстки -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Иконки FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Библиотека конфетти для празднования успеха -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --bg-color: #d4f6fa; /* Освежающий светлый оттенок морской волны */
+            --main-teal: #008080; /* Морская волна */
+            --dark-teal: #005a5a;
+            --burgundy: #800000; /* Бордовый */
+            --burgundy-light: #b30000;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Анимация пульсации для кнопок */
+        @keyframes pulse-subtle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        .pulse-btn {
+            animation: pulse-subtle 2s infinite ease-in-out;
+        }
+
+        /* Мягкие переходы */
+        .transition-all-custom {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between py-6 px-4">
+
+    <!-- Основной контейнер игры -->
+    <main class="flex-grow flex items-center justify-center w-full max-w-md mx-auto">
+        <div class="w-full bg-white rounded-3xl shadow-xl border border-teal-100 p-6 space-y-6 relative overflow-hidden">
+            
+            <!-- Декоративные элементы на фоне -->
+            <div class="absolute -top-10 -right-10 w-24 h-24 bg-teal-50 rounded-full -z-10"></div>
+            <div class="absolute -bottom-10 -left-10 w-24 h-24 bg-red-50 rounded-full -z-10"></div>
+
+            <!-- Шапка тренажёра -->
+            <div class="text-center relative">
+                <!-- Кнопка сброса прогресса -->
+                <button onclick="resetGame()" class="absolute top-0 right-0 text-gray-300 hover:text-gray-500 transition-colors" title="Сбросить прогресс">
+                    <i class="fa-solid fa-rotate-right text-sm"></i>
+                </button>
+
+                <div class="w-16 h-16 mx-auto mb-2 bg-teal-50 rounded-2xl flex items-center justify-center border-2 border-[var(--main-teal)] shadow-sm">
+                    <i class="fa-solid fa-cat text-3xl text-[var(--main-teal)]"></i>
+                </div>
+                <h1 class="text-lg font-extrabold text-gray-800 tracking-tight">Кот и Код</h1>
+                <p class="text-xs font-semibold text-[var(--main-teal)] uppercase tracking-wider">Падежный тренажёр</p>
+            </div>
+
+            <!-- Карточка текущего слова -->
+            <div class="bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 rounded-2xl p-4 text-center shadow-inner">
+                <div class="flex justify-between items-center px-1 mb-1">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-teal-600">Склоняем слово:</span>
+                    <!-- Счётчик очков -->
+                    <span class="text-xs font-bold text-[var(--burgundy)] bg-red-50 px-2 py-0.5 rounded-full" id="score-counter">
+                        <i class="fa-solid fa-star text-amber-400 mr-1"></i>Очки: 0
+                    </span>
+                </div>
+                <div class="text-3xl font-extrabold text-[var(--burgundy)] tracking-wide uppercase" id="target-word">КОТ</div>
+            </div>
+
+            <!-- Форма с падежами -->
+            <div class="space-y-3" id="cases-list">
+                
+                <!-- Именительный (Всегда заполнен) -->
+                <div class="grid grid-cols-12 gap-2 items-center bg-gray-50/70 p-3 rounded-xl border border-gray-100">
+                    <div class="col-span-4 font-bold text-xs text-teal-900">И. п. <span class="font-normal text-gray-400 block text-[10px]">(есть)</span></div>
+                    <div class="col-span-3 text-[11px] text-gray-500 font-medium">кто? что?</div>
+                    <div class="col-span-5">
+                        <input type="text" id="p-nom" disabled class="w-full bg-gray-200/60 text-gray-600 text-sm font-bold py-2 px-3 rounded-xl border border-gray-200 text-center cursor-not-allowed">
+                    </div>
+                </div>
+
+                <!-- Родительный -->
+                <div class="grid grid-cols-12 gap-2 items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="col-span-4 font-bold text-xs text-teal-900">Р. п. <span class="font-normal text-gray-400 block text-[10px]">(нет)</span></div>
+                    <div class="col-span-3 text-[11px] text-gray-500 font-medium">кого? чего?</div>
+                    <div class="col-span-5 relative">
+                        <input type="text" id="p-rod" placeholder="..." autocomplete="off" class="w-full text-sm font-semibold py-2 px-3 rounded-xl border border-gray-300 text-center focus:outline-none focus:border-[var(--main-teal)] focus:ring-2 focus:ring-teal-100 transition-all-custom">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs hidden" id="icon-p-rod"></span>
+                    </div>
+                </div>
+
+                <!-- Дательный -->
+                <div class="grid grid-cols-12 gap-2 items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="col-span-4 font-bold text-xs text-teal-900">Д. п. <span class="font-normal text-gray-400 block text-[10px]">(рад)</span></div>
+                    <div class="col-span-3 text-[11px] text-gray-500 font-medium">кому? чему?</div>
+                    <div class="col-span-5 relative">
+                        <input type="text" id="p-dat" placeholder="..." autocomplete="off" class="w-full text-sm font-semibold py-2 px-3 rounded-xl border border-gray-300 text-center focus:outline-none focus:border-[var(--main-teal)] focus:ring-2 focus:ring-teal-100 transition-all-custom">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs hidden" id="icon-p-dat"></span>
+                    </div>
+                </div>
+
+                <!-- Винительный -->
+                <div class="grid grid-cols-12 gap-2 items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="col-span-4 font-bold text-xs text-teal-900">В. п. <span class="font-normal text-gray-400 block text-[10px]">(вижу)</span></div>
+                    <div class="col-span-3 text-[11px] text-gray-500 font-medium">кого? что?</div>
+                    <div class="col-span-5 relative">
+                        <input type="text" id="p-vin" placeholder="..." autocomplete="off" class="w-full text-sm font-semibold py-2 px-3 rounded-xl border border-gray-300 text-center focus:outline-none focus:border-[var(--main-teal)] focus:ring-2 focus:ring-teal-100 transition-all-custom">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs hidden" id="icon-p-vin"></span>
+                    </div>
+                </div>
+
+                <!-- Творительный -->
+                <div class="grid grid-cols-12 gap-2 items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="col-span-4 font-bold text-xs text-teal-900">Т. п. <span class="font-normal text-gray-400 block text-[10px]">(доволен)</span></div>
+                    <div class="col-span-3 text-[11px] text-gray-500 font-medium">кем? чем?</div>
+                    <div class="col-span-5 relative">
+                        <input type="text" id="p-tvor" placeholder="..." autocomplete="off" class="w-full text-sm font-semibold py-2 px-3 rounded-xl border border-gray-300 text-center focus:outline-none focus:border-[var(--main-teal)] focus:ring-2 focus:ring-teal-100 transition-all-custom">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs hidden" id="icon-p-tvor"></span>
+                    </div>
+                </div>
+
+                <!-- Предложный -->
+                <div class="grid grid-cols-12 gap-2 items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="col-span-4 font-bold text-xs text-teal-900">П. п. <span class="font-normal text-gray-400 block text-[10px]">(думаю о)</span></div>
+                    <div class="col-span-3 text-[11px] text-gray-500 font-medium">о ком? о чём?</div>
+                    <div class="col-span-5 relative">
+                        <input type="text" id="p-pred" placeholder="..." autocomplete="off" class="w-full text-sm font-semibold py-2 px-3 rounded-xl border border-gray-300 text-center focus:outline-none focus:border-[var(--main-teal)] focus:ring-2 focus:ring-teal-100 transition-all-custom">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs hidden" id="icon-p-pred"></span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Кнопки управления -->
+            <div class="space-y-2">
+                <button onclick="checkAnswers()" id="btn-check" class="pulse-btn w-full text-white font-extrabold py-3.5 px-4 rounded-2xl shadow-md bg-gradient-to-r from-[var(--burgundy)] to-[var(--burgundy-light)] hover:opacity-95 active:scale-[0.98] transition-all-custom cursor-pointer text-center text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-clipboard-check"></i> Проверить ответы
+                </button>
+
+                <button onclick="nextWord()" id="btn-next" class="hidden w-full text-white font-extrabold py-3.5 px-4 rounded-2xl shadow-md bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-95 active:scale-[0.98] transition-all-custom cursor-pointer text-center text-sm flex items-center justify-center gap-2">
+                    Следующее слово <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Блок результатов -->
+            <div id="result-message" class="hidden text-center p-4 rounded-2xl text-xs font-bold transition-all-custom border"></div>
+
+        </div>
+    </main>
+
+    <!-- Подвал -->
+    <footer class="w-full text-center text-[10px] text-teal-800/60 font-medium mt-4">
+        Мастерская семейного обучения «Кот и Код»
+    </footer>
+
+    <script>
+        // База слов с массивами допустимых ответов (чтобы покрыть варианты с предлогами и без)
+        const wordsDatabase = [
+            {
+                nominative: "кот",
+                answers: {
+                    'p-rod': ["кота", "у кота", "нет кота"],
+                    'p-dat': ["коту", "к коту", "рад коту"],
+                    'p-vin': ["кота", "вижу кота"],
+                    'p-tvor': ["котом", "доволен котом", "с котом", "со своим котом"],
+                    'p-pred': ["коте", "о коте", "об коте", "обо коте", "думаю о коте"]
+                }
+            },
+            {
+                nominative: "книга",
+                answers: {
+                    'p-rod': ["книги", "нет книги", "у книги"],
+                    'p-dat': ["книге", "к книге", "рад книге"],
+                    'p-vin': ["книгу", "вижу книгу"],
+                    'p-tvor': ["книгой", "книгою", "с книгой", "доволен книгой"],
+                    'p-pred': ["книге", "о книге", "в книге", "думаю о книге"]
+                }
+            },
+            {
+                nominative: "окно",
+                answers: {
+                    'p-rod': ["окна", "нет окна", "из окна"],
+                    'p-dat': ["окну", "к окну", "рад окну"],
+                    'p-vin': ["окно", "вижу окно", "в окно"],
+                    'p-tvor': ["окном", "за окном", "под окном", "доволен окном"],
+                    'p-pred': ["окне", "об окне", "о окне", "на окне", "в окне", "думаю об окне"]
+                }
+            },
+            {
+                nominative: "лиса",
+                answers: {
+                    'p-rod': ["лисы", "нет лисы", "у лисы"],
+                    'p-dat': ["лисе", "к лисе", "рад лисе"],
+                    'p-vin': ["лису", "вижу лису"],
+                    'p-tvor': ["лисой", "лисою", "с лисой", "доволен лисой"],
+                    'p-pred': ["лисе", "о лисе", "думаю о лисе"]
+                }
+            }
+        ];
+
+        let currentWordIndex = 0;
+        let score = 0;
+
+        // Генерация победного звука через Web Audio API
+        function playSuccessSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Первая нота
+                const osc1 = ctx.createOscillator();
+                const gain1 = ctx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+                gain1.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc1.start();
+                osc1.stop(ctx.currentTime + 0.3);
+
+                // Вторая гармоничная нота чуть позже
+                setTimeout(() => {
+                    const osc2 = ctx.createOscillator();
+                    const gain2 = ctx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(659.25, ctx.currentTime); // E5
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    gain2.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                    osc2.start();
+                    osc2.stop(ctx.currentTime + 0.4);
+                }, 120);
+
+                // Третья финальная торжественная нота
+                setTimeout(() => {
+                    const osc3 = ctx.createOscillator();
+                    const gain3 = ctx.createGain();
+                    osc3.type = 'sine';
+                    osc3.frequency.setValueAtTime(783.99, ctx.currentTime); // G5
+                    osc3.connect(gain3);
+                    gain3.connect(ctx.destination);
+                    gain3.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gain3.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                    osc3.start();
+                    osc3.stop(ctx.currentTime + 0.5);
+                }, 240);
+            } catch(e) {
+                console.log("Audio not supported or blocked");
+            }
+        }
+
+        // Загрузка слова по индексу
+        function loadWord(index) {
+            const data = wordsDatabase[index];
+            document.getElementById('target-word').innerText = data.nominative;
+            document.getElementById('p-nom').value = data.nominative;
+            
+            // Сброс полей ввода и стилей
+            const inputIds = ['p-rod', 'p-dat', 'p-vin', 'p-tvor', 'p-pred'];
+            inputIds.forEach(id => {
+                const input = document.getElementById(id);
+                input.value = "";
+                input.className = "w-full text-sm font-semibold py-2 px-3 rounded-xl border border-gray-300 text-center focus:outline-none focus:border-[var(--main-teal)] focus:ring-2 focus:ring-teal-100 transition-all-custom";
+                
+                // Прячем иконки статуса внутри полей
+                const icon = document.getElementById('icon-' + id);
+                icon.className = "absolute right-3 top-1/2 -translate-y-1/2 text-xs hidden";
+            });
+
+            // Прячем кнопку "Дальше", показываем "Проверить"
+            document.getElementById('btn-next').classList.add('hidden');
+            document.getElementById('btn-check').classList.remove('hidden');
+            document.getElementById('result-message').classList.add('hidden');
+        }
+
+        // Проверка введённых ответов
+        function checkAnswers() {
+            const currentWord = wordsDatabase[currentWordIndex];
+            const inputIds = ['p-rod', 'p-dat', 'p-vin', 'p-tvor', 'p-pred'];
+            let allCorrect = true;
+            let answeredCount = 0;
+
+            inputIds.forEach(id => {
+                const input = document.getElementById(id);
+                const icon = document.getElementById('icon-' + id);
+                // Очищаем пробелы, приводим к нижнему регистру, заменяем буквы ё на е для удобства
+                const val = input.value.trim().toLowerCase().replace(/ё/g, 'е');
+
+                if (val === "") {
+                    allCorrect = false;
+                    input.className = "w-full text-sm font-semibold py-2 px-3 rounded-xl border-2 border-amber-300 bg-amber-50/50 text-center transition-all-custom";
+                    icon.innerHTML = "<i class='fa-solid fa-circle-question text-amber-500'></i>";
+                    icon.classList.remove('hidden');
+                    return;
+                }
+
+                answeredCount++;
+
+                // Сравниваем со списком корректных вариантов для этого падежа
+                const possibleCorrect = currentWord.answers[id].map(ans => ans.toLowerCase().replace(/ё/g, 'е'));
+                
+                if (possibleCorrect.includes(val)) {
+                    // Ответ правильный!
+                    input.className = "w-full text-sm font-bold py-2 pl-3 pr-8 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 text-center transition-all-custom";
+                    icon.innerHTML = "<i class='fa-solid fa-circle-check text-emerald-500'></i>";
+                    icon.classList.remove('hidden');
+                } else {
+                    // Ошибка
+                    allCorrect = false;
+                    input.className = "w-full text-sm font-bold py-2 pl-3 pr-8 rounded-xl border-2 border-rose-400 bg-rose-50 text-rose-800 text-center transition-all-custom";
+                    icon.innerHTML = "<i class='fa-solid fa-circle-xmark text-rose-500'></i>";
+                    icon.classList.remove('hidden');
+                }
+            });
+
+            const resultBlock = document.getElementById('result-message');
+            resultBlock.classList.remove('hidden');
+
+            if (answeredCount < inputIds.length) {
+                resultBlock.className = "text-center p-4 rounded-2xl text-xs font-bold bg-amber-50 text-amber-800 border-amber-200 transition-all-custom";
+                resultBlock.innerHTML = "<i class='fa-solid fa-pen-nib mr-1.5'></i> Заполните все падежи, чтобы пройти проверку!";
+            } else if (allCorrect) {
+                // Полная победа!
+                score += 10;
+                document.getElementById('score-counter').innerHTML = `<i class="fa-solid fa-star text-amber-400 mr-1"></i>Очки: ${score}`;
+                
+                resultBlock.className = "text-center p-4 rounded-2xl text-xs font-bold bg-emerald-50 text-emerald-800 border-emerald-200 transition-all-custom";
+                resultBlock.innerHTML = "🎉 Ура! Все падежи раскрыты абсолютно верно! Ты супер!";
+                
+                // Запуск салюта конфетти
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#008080', '#800000', '#ffd700', '#22c55e']
+                });
+
+                playSuccessSound();
+
+                // Показываем кнопку перехода к следующему слову
+                document.getElementById('btn-check').classList.add('hidden');
+                document.getElementById('btn-next').classList.remove('hidden');
+            } else {
+                resultBlock.className = "text-center p-4 rounded-2xl text-xs font-bold bg-rose-50 text-rose-800 border-rose-200 transition-all-custom";
+                resultBlock.innerHTML = "🧐 Ой, есть ошибки или пустые поля. Попробуй исправить подсвеченные строчки!";
+            }
+        }
+
+        // Переход к следующему слову
+        function nextWord() {
+            currentWordIndex = (currentWordIndex + 1) % wordsDatabase.length;
+            loadWord(currentWordIndex);
+        }
+
+        // Сброс очков и старт с начала
+        function resetGame() {
+            score = 0;
+            document.getElementById('score-counter').innerHTML = `<i class="fa-solid fa-star text-amber-400 mr-1"></i>Очки: ${score}`;
+            currentWordIndex = 0;
+            loadWord(currentWordIndex);
+        }
+
+        // Инициализация игры при загрузке страницы
+        window.onload = function() {
+            loadWord(0);
+        }
+    </script>
+</body>
+</html>

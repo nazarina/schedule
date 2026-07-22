@@ -1,1 +1,844 @@
-ь
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Present Simple vs Continuous (3-4 класс) | Кот и Код</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #E0F7FA;
+            background-image: radial-gradient(#B2EBF2 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .title-font {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+
+        @keyframes cat-bounce {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-5px) rotate(2deg); }
+        }
+        .wiggle-animation {
+            animation: cat-bounce 2.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        .pulse-btn {
+            animation: pulse-subtle 2s ease-in-out infinite;
+        }
+
+        .btn-card {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-card:hover {
+            transform: translateY(-2px);
+        }
+        .btn-card:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        /* Тултипы перевода слов */
+        .hover-word {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            border-bottom: 2px dashed #0d9488;
+            padding-bottom: 1px;
+            color: #0f766e;
+            font-weight: 800;
+            transition: color 0.2s;
+        }
+        .hover-word:hover {
+            color: #0369a1;
+            border-bottom-color: #0284c7;
+        }
+        .hover-word .tooltip-text {
+            visibility: hidden;
+            opacity: 0;
+            background-color: #0f172a;
+            color: #ffffff;
+            text-align: center;
+            border-radius: 10px;
+            padding: 4px 10px;
+            position: absolute;
+            z-index: 50;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+        }
+        .hover-word .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #0f172a transparent transparent transparent;
+        }
+        .hover-word:hover .tooltip-text, .hover-word:focus .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(-3px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between py-4 px-3 sm:px-4 text-slate-800">
+
+    <!-- Основной контейнер -->
+    <main class="flex-grow flex flex-col items-center justify-center w-full max-w-xl mx-auto space-y-5">
+        
+        <!-- Карточка тренажёра -->
+        <div class="w-full bg-white rounded-3xl shadow-xl border-4 border-teal-200 p-4 sm:p-6 space-y-4 relative overflow-hidden">
+            
+            <!-- Декоративные фоновые элементы -->
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-amber-100 rounded-full -z-10"></div>
+            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-teal-100 rounded-full -z-10"></div>
+
+            <!-- Шапка с котиком и очками -->
+            <div class="flex justify-between items-center bg-gradient-to-r from-teal-50 to-emerald-50 p-3 rounded-2xl border-2 border-teal-200">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-11 h-11 bg-amber-400 text-white rounded-2xl flex items-center justify-center text-2xl shadow-md wiggle-animation">
+                        🐱
+                    </div>
+                    <div>
+                        <h1 class="text-base font-extrabold text-teal-950 leading-tight title-font">Simple vs Continuous</h1>
+                        <p class="text-[11px] font-extrabold text-teal-600 tracking-wide">Кот-Грамотей | 3-4 класс</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <!-- Счётчик звёзд -->
+                    <div class="bg-amber-100 border-2 border-amber-300 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                        <span class="text-lg">⭐</span>
+                        <span class="text-base font-black text-amber-900" id="score-counter">0</span>
+                    </div>
+                    <!-- Перезапуск -->
+                    <button onclick="resetGame()" class="w-9 h-9 rounded-full bg-white border-2 border-teal-200 text-teal-600 hover:bg-teal-100 flex items-center justify-center transition-all shadow-sm cursor-pointer" title="Начать заново">
+                        <i class="fa-solid fa-rotate-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Подсказка про тултип -->
+            <div class="bg-sky-50 border border-sky-200 rounded-xl py-1.5 px-3 text-center text-[11px] font-extrabold text-sky-800 flex items-center justify-center gap-1.5">
+                <span>💡 <b>Подсказка:</b> Наведи или нажми на слова со штрихом — чтобы узнать их перевод!</span>
+            </div>
+
+            <!-- Карточка задания -->
+            <div class="bg-gradient-to-b from-sky-50 to-teal-50/40 border-3 border-teal-200 rounded-2xl p-4 sm:p-5 text-center space-y-4 relative shadow-sm">
+                
+                <!-- Номер вопроса и маркер времени -->
+                <div class="flex justify-between items-center text-[11px] font-black text-teal-700">
+                    <span class="bg-white/90 px-3 py-1 rounded-full border border-teal-200 shadow-2xs" id="question-category">
+                        Вопрос 1 из 100
+                    </span>
+                    <span id="time-marker-badge" class="bg-amber-200 text-amber-900 px-2.5 py-1 rounded-full border border-amber-300 font-extrabold">
+                        ⏱️ Маркер: ...
+                    </span>
+                </div>
+
+                <!-- Картинка/Эмодзи предмета или действия -->
+                <div class="py-1">
+                    <span id="item-emoji" class="text-6xl drop-shadow-sm inline-block transform hover:scale-110 transition-transform">
+                        🏃‍♂️
+                    </span>
+                </div>
+
+                <!-- Предложение с интерактивными тултипами -->
+                <div class="bg-white p-4 rounded-2xl border-2 border-teal-100 shadow-sm min-h-[90px] flex flex-col justify-center">
+                    <div id="sentence-prompt" class="text-lg sm:text-xl font-extrabold text-slate-800 tracking-wide leading-relaxed">
+                        <!-- Динамический текст с тултипами -->
+                    </div>
+                    <p id="sentence-translation" class="text-xs font-bold text-slate-400 mt-2">
+                        (Полный перевод предложения)
+                    </p>
+                </div>
+
+                <!-- Варианты ответов -->
+                <div id="answers-container" class="grid grid-cols-2 gap-3 pt-1">
+                    <!-- Динамические кнопки ответов -->
+                </div>
+
+            </div>
+
+            <!-- Сообщение-объяснение после ответа -->
+            <div id="feedback-card" class="hidden p-3.5 rounded-2xl text-xs font-black transition-all border-2 text-center">
+                <!-- Заполняется скриптом -->
+            </div>
+
+            <!-- Кнопка "Дальше" -->
+            <button id="btn-next" onclick="nextQuestion()" class="hidden pulse-btn w-full text-white font-extrabold py-3.5 px-4 rounded-2xl shadow-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:opacity-95 active:scale-95 transition-all cursor-pointer text-base flex items-center justify-center gap-2">
+                <span>Следующий вопрос</span> 🐾 <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+        </div>
+
+        <!-- БЛОК С ПРАВИЛАМИ (2 Таблицы-схемы) -->
+        <div class="w-full space-y-3 pt-2">
+            
+            <div class="text-center">
+                <h2 class="text-sm font-black text-teal-900 tracking-wide uppercase bg-teal-100/80 inline-block px-4 py-1 rounded-full border border-teal-300">
+                    📖 Шпаргалка Времён (Правила)
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                
+                <!-- Таблица 1: Present Simple -->
+                <div class="bg-white rounded-2xl p-3.5 border-3 border-amber-300 shadow-sm space-y-2 text-xs">
+                    <div class="flex items-center justify-between border-b border-amber-100 pb-2">
+                        <span class="font-black text-amber-900 text-sm flex items-center gap-1.5">
+                            🔄 Present Simple
+                        </span>
+                        <span class="bg-amber-100 text-amber-800 font-extrabold text-[10px] px-2 py-0.5 rounded-md">Обычное / Регулярно</span>
+                    </div>
+
+                    <!-- Маркеры времени -->
+                    <div class="bg-amber-50/80 p-2 rounded-xl border border-amber-200">
+                        <div class="font-black text-amber-900 text-[11px] mb-1">🔑 Слова-маркеры:</div>
+                        <div class="flex flex-wrap gap-1 text-[10px] font-bold text-amber-800">
+                            <span class="bg-white px-1.5 py-0.5 rounded border border-amber-200">every day</span>
+                            <span class="bg-white px-1.5 py-0.5 rounded border border-amber-200">always</span>
+                            <span class="bg-white px-1.5 py-0.5 rounded border border-amber-200">usually</span>
+                            <span class="bg-white px-1.5 py-0.5 rounded border border-amber-200">often</span>
+                            <span class="bg-white px-1.5 py-0.5 rounded border border-amber-200">sometimes</span>
+                        </div>
+                    </div>
+
+                    <!-- Наглядные схемы -->
+                    <div class="space-y-1.5 font-extrabold text-[11px]">
+                        <div class="flex items-center justify-between bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                            <span class="text-emerald-700">➕ I / You / We / They</span>
+                            <span class="bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded font-black">V1 (play)</span>
+                        </div>
+                        <div class="flex items-center justify-between bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                            <span class="text-emerald-700">➕ He / She / It</span>
+                            <span class="bg-amber-200 text-amber-950 px-2 py-0.5 rounded font-black">V + -s / -es 🐾</span>
+                        </div>
+                        <div class="flex items-center justify-between bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                            <span class="text-rose-700">➖ Отрицание</span>
+                            <span class="bg-rose-100 text-rose-900 px-1.5 py-0.5 rounded">don't / doesn't + V1</span>
+                        </div>
+                        <div class="flex items-center justify-between bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                            <span class="text-sky-700">❓ Вопрос</span>
+                            <span class="bg-sky-100 text-sky-900 px-1.5 py-0.5 rounded">Do / Does ... + V1?</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Таблица 2: Present Continuous -->
+                <div class="bg-white rounded-2xl p-3.5 border-3 border-sky-300 shadow-sm space-y-2 text-xs">
+                    <div class="flex items-center justify-between border-b border-sky-100 pb-2">
+                        <span class="font-black text-sky-900 text-sm flex items-center gap-1.5">
+                            ⚡ Present Continuous
+                        </span>
+                        <span class="bg-sky-100 text-sky-800 font-extrabold text-[10px] px-2 py-0.5 rounded-md">Прямо сейчас!</span>
+                    </div>
+
+                    <!-- Маркеры времени -->
+                    <div class="bg-sky-50/80 p-2 rounded-xl border border-sky-200">
+                        <div class="font-black text-sky-900 text-[11px] mb-1">🔑 Слова-маркеры:</div>
+                        <div class="flex flex-wrap gap-1 text-[10px] font-bold text-sky-800">
+                            <span class="bg-white px-1.5 py-0.5 rounded border border-sky-200">now</span>
+                            <span class="bg-white px-1.5 py-0.5 rounded border border-sky-200">at the moment</span>
+                            <span class="bg-white px-1.5 py-0.5 rounded border border-sky-200">Look! 👀</span>
+                            <span class="bg-white px-1.5 py-0.5 rounded border border-sky-200">Listen! 🎧</span>
+                        </div>
+                    </div>
+
+                    <!-- Наглядные схемы -->
+                    <div class="space-y-1.5 font-extrabold text-[11px]">
+                        <div class="flex items-center justify-between bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                            <span class="text-sky-700">➕ I</span>
+                            <span class="bg-sky-100 text-sky-900 px-2 py-0.5 rounded font-black">am + V-ing</span>
+                        </div>
+                        <div class="flex items-center justify-between bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                            <span class="text-sky-700">➕ He / She / It</span>
+                            <span class="bg-sky-100 text-sky-900 px-2 py-0.5 rounded font-black">is + V-ing</span>
+                        </div>
+                        <div class="flex items-center justify-between bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                            <span class="text-sky-700">➕ You / We / They</span>
+                            <span class="bg-sky-100 text-sky-900 px-2 py-0.5 rounded font-black">are + V-ing</span>
+                        </div>
+                        <div class="flex items-center justify-between bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                            <span class="text-rose-700">➖ / ❓ Минус & Вопрос</span>
+                            <span class="bg-rose-100 text-rose-900 px-1.5 py-0.5 rounded">am/is/are + not / ?</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Подвал -->
+    <footer class="w-full text-center text-xs text-teal-800/80 font-extrabold mt-4">
+        Мастерская семейного обучения «Кот и Код»
+    </footer>
+
+    <script>
+        // База данных из 100 вопросов по Present Simple vs Continuous
+        // С разбором по словам (слово + перевод)
+        const rawDatabase = [
+            // 1-10
+            {
+                emoji: "📖",
+                marker: "now",
+                words: [
+                    { en: "She", ru: "Она" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "a book", ru: "книгу" },
+                    { en: "now.", ru: "сейчас." }
+                ],
+                translation: "Она читает книгу сейчас.",
+                options: ["is reading", "reads"],
+                correct: "is reading",
+                rule: "⚡ Маркер **now** (сейчас) ➔ Present Continuous (**is reading**)."
+            },
+            {
+                emoji: "⚽",
+                marker: "every day",
+                words: [
+                    { en: "They", ru: "Они" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "football", ru: "в футбол" },
+                    { en: "every day.", ru: "каждый день." }
+                ],
+                translation: "Они играют в футбол каждый день.",
+                options: ["play", "are playing"],
+                correct: "play",
+                rule: "🔄 Маркер **every day** (регулярно) ➔ Present Simple (**play**)."
+            },
+            {
+                emoji: "🐱",
+                marker: "at the moment",
+                words: [
+                    { en: "Look!", ru: "Смотри!" },
+                    { en: "The cat", ru: "Кот" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "at the moment.", ru: "в данный момент." }
+                ],
+                translation: "Смотри! Кот спит прямо сейчас.",
+                options: ["is sleeping", "sleeps"],
+                correct: "is sleeping",
+                rule: "⚡ Маркер **Look!** и **at the moment** ➔ Present Continuous (**is sleeping**)."
+            },
+            {
+                emoji: "🥛",
+                marker: "always",
+                words: [
+                    { en: "I", ru: "Я" },
+                    { en: "always", ru: "всегда" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "milk", ru: "молоко" },
+                    { en: "in the morning.", ru: "по утрам." }
+                ],
+                translation: "Я всегда пью молоко по утрам.",
+                options: ["drink", "am drinking"],
+                correct: "drink",
+                rule: "🔄 Маркер **always** (всегда) ➔ Present Simple (**drink**)."
+            },
+            {
+                emoji: "🏊‍♂️",
+                marker: "Listen!",
+                words: [
+                    { en: "Listen!", ru: "Слушай!" },
+                    { en: "He", ru: "Он" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "a song.", ru: "песню." }
+                ],
+                translation: "Слушай! Он поёт песню.",
+                options: ["is singing", "sings"],
+                correct: "is singing",
+                rule: "⚡ Маркер **Listen!** (прямо сейчас) ➔ Present Continuous (**is singing**)."
+            },
+            {
+                emoji: "🚴‍♀️",
+                marker: "usually",
+                words: [
+                    { en: "We", ru: "Мы" },
+                    { en: "usually", ru: "обычно" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "bikes", ru: "на велосипедах" },
+                    { en: "in summer.", ru: "летом." }
+                ],
+                translation: "Мы обычно катаемся на велосипедах летом.",
+                options: ["ride", "are riding"],
+                correct: "ride",
+                rule: "🔄 Маркер **usually** (обычно) ➔ Present Simple (**ride**)."
+            },
+            {
+                emoji: "🎨",
+                marker: "right now",
+                words: [
+                    { en: "My sister", ru: "Моя сестра" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "a picture", ru: "картину" },
+                    { en: "right now.", ru: "прямо сейчас." }
+                ],
+                translation: "Моя сестра рисует картину прямо сейчас.",
+                options: ["is drawing", "draws"],
+                correct: "is drawing",
+                rule: "⚡ Маркер **right now** ➔ Present Continuous (**is drawing**)."
+            },
+            {
+                emoji: "🍎",
+                marker: "often",
+                words: [
+                    { en: "He", ru: "Он" },
+                    { en: "often", ru: "часто" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "apples.", ru: "яблоки." }
+                ],
+                translation: "Он часто ест яблоки.",
+                options: ["eats", "is eating"],
+                correct: "eats",
+                rule: "🔄 Маркер **often** (часто) + **He** ➔ добавляем окончания -s (**eats**)."
+            },
+            {
+                emoji: "🌧️",
+                marker: "Look!",
+                words: [
+                    { en: "Look!", ru: "Смотри!" },
+                    { en: "It", ru: "Оно (погода)" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "outside.", ru: "на улице." }
+                ],
+                translation: "Смотри! На улице идёт дождь.",
+                options: ["is raining", "rains"],
+                correct: "is raining",
+                rule: "⚡ Маркер **Look!** ➔ действие за окном прямо сейчас (**is raining**)."
+            },
+            {
+                emoji: "🐶",
+                marker: "every evening",
+                words: [
+                    { en: "The dog", ru: "Собака" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "in the park", ru: "в парке" },
+                    { en: "every evening.", ru: "каждый вечер." }
+                ],
+                translation: "Собака бегает в парке каждый вечер.",
+                options: ["runs", "is running"],
+                correct: "runs",
+                rule: "🔄 Маркер **every evening** + **Dog (it)** ➔ Present Simple (**runs**)."
+            },
+
+            // 11-20
+            {
+                emoji: "🍳",
+                marker: "at the moment",
+                words: [
+                    { en: "Mom", ru: "Мама" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "pizza", ru: "пиццу" },
+                    { en: "at the moment.", ru: "сейчас." }
+                ],
+                translation: "Мама готовит пиццу сейчас.",
+                options: ["is cooking", "cooks"],
+                correct: "is cooking",
+                rule: "⚡ Маркер **at the moment** ➔ Present Continuous (**is cooking**)."
+            },
+            {
+                emoji: "🏫",
+                marker: "every day",
+                words: [
+                    { en: "Pupils", ru: "Ученики" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "to school", ru: "в школу" },
+                    { en: "every day.", ru: "каждый день." }
+                ],
+                translation: "Ученики ходят в школу каждый день.",
+                options: ["go", "are going"],
+                correct: "go",
+                rule: "🔄 Привычное действие **every day** ➔ Present Simple (**go**)."
+            },
+            {
+                emoji: "🎮",
+                marker: "now",
+                words: [
+                    { en: "Tom and Tim", ru: "Том и Тим" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "games", ru: "в игры" },
+                    { en: "now.", ru: "сейчас." }
+                ],
+                translation: "Том и Тим играют в игры сейчас.",
+                options: ["are playing", "play"],
+                correct: "are playing",
+                rule: "⚡ **Tom and Tim** (они/they) + **now** ➔ **are playing**."
+            },
+            {
+                emoji: "🐱",
+                marker: "sometimes",
+                words: [
+                    { en: "My cat", ru: "Мой кот" },
+                    { en: "sometimes", ru: "иногда" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "on the sofa.", ru: "на диване." }
+                ],
+                translation: "Мой кот иногда спит на диване.",
+                options: ["sleeps", "is sleeping"],
+                correct: "sleeps",
+                rule: "🔄 Маркер **sometimes** + **cat (it)** ➔ **sleeps**."
+            },
+            {
+                emoji: "🎸",
+                marker: "Listen!",
+                words: [
+                    { en: "Listen!", ru: "Слушай!" },
+                    { en: "My brother", ru: "Мой брат" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "the guitar.", ru: "на гитаре." }
+                ],
+                translation: "Слушай! Мой брат играет на гитаре.",
+                options: ["is playing", "plays"],
+                correct: "is playing",
+                rule: "⚡ Маркер **Listen!** ➔ Present Continuous (**is playing**)."
+            },
+            {
+                emoji: "📺",
+                marker: "in the evening",
+                words: [
+                    { en: "Dad", ru: "Папа" },
+                    { en: "usually", ru: "обычно" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "TV.", ru: "телевизор." }
+                ],
+                translation: "Папа обычно смотрит телевизор.",
+                options: ["watches", "is watching"],
+                correct: "watches",
+                rule: "🔄 Маркер **usually** + **Dad (he)** ➔ **watches**."
+            },
+            {
+                emoji: "🚗",
+                marker: "Look!",
+                words: [
+                    { en: "Look!", ru: "Смотри!" },
+                    { en: "A red car", ru: "Красная машина" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "fast.", ru: "быстро." }
+                ],
+                translation: "Смотри! Красная машина едет быстро.",
+                options: ["is driving", "drives"],
+                correct: "is driving",
+                rule: "⚡ Маркер **Look!** ➔ Present Continuous (**is driving**)."
+            },
+            {
+                emoji: "🐦",
+                marker: "always",
+                words: [
+                    { en: "Birds", ru: "Птицы" },
+                    { en: "always", ru: "всегда" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "in spring.", ru: "весной." }
+                ],
+                translation: "Птицы всегда поют весной.",
+                options: ["sing", "are singing"],
+                correct: "sing",
+                rule: "🔄 Постоянный факт / **always** ➔ Present Simple (**sing**)."
+            },
+            {
+                emoji: "🍵",
+                marker: "now",
+                words: [
+                    { en: "Grandma", ru: "Бабушка" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "tea", ru: "чай" },
+                    { en: "now.", ru: "сейчас." }
+                ],
+                translation: "Бабушка пьёт чай сейчас.",
+                options: ["is drinking", "drinks"],
+                correct: "is drinking",
+                rule: "⚡ Действие прямо сейчас (**now**) ➔ **is drinking**."
+            },
+            {
+                emoji: "🦷",
+                marker: "every morning",
+                words: [
+                    { en: "I", ru: "Я" },
+                    { en: "GAP", ru: "пропуск" },
+                    { en: "my teeth", ru: "зубы" },
+                    { en: "every morning.", ru: "каждое утро." }
+                ],
+                translation: "Я чищу зубы каждое утро.",
+                options: ["clean", "am cleaning"],
+                correct: "clean",
+                rule: "🔄 Ежедневная привычка **every morning** ➔ **clean**."
+            }
+        ];
+
+        // Генерируем расширенную базу из 100 вариантов на основе типичных конструкций 3-4 класса
+        function generate100Questions() {
+            const list = [...rawDatabase];
+            const subjects = [
+                { en: "He", ru: "Он", singular: true },
+                { en: "She", ru: "Она", singular: true },
+                { en: "They", ru: "Они", singular: false },
+                { en: "We", ru: "Мы", singular: false },
+                { en: "My friend", ru: "Мой друг", singular: true },
+                { en: "The boys", ru: "Мальчики", singular: false }
+            ];
+
+            const verbs = [
+                { base: "run", s: "runs", ing: "is running", ingPlural: "are running", emoji: "🏃‍♂️", trans: "бегать / бежать" },
+                { base: "jump", s: "jumps", ing: "is jumping", ingPlural: "are jumping", emoji: "🐸", trans: "прыгать" },
+                { base: "read", s: "reads", ing: "is reading", ingPlural: "are reading", emoji: "📚", trans: "читать" },
+                { base: "write", s: "writes", ing: "is writing", ingPlural: "are writing", emoji: "✏️", trans: "писать" },
+                { base: "eat", s: "eats", ing: "is eating", ingPlural: "are eating", emoji: "🍕", trans: "есть" },
+                { base: "fly", s: "flies", ing: "is flying", ingPlural: "are flying", emoji: "✈️", trans: "летать" },
+                { base: "dance", s: "dances", ing: "is dancing", ingPlural: "are dancing", emoji: "💃", trans: "танцевать" },
+                { base: "swim", s: "swims", ing: "is swimming", ingPlural: "are swimming", emoji: "🏊‍♂️", trans: "плавать" }
+            ];
+
+            let count = list.length;
+            while (count < 100) {
+                const sub = subjects[count % subjects.length];
+                const verb = verbs[count % verbs.length];
+                const isContinuous = count % 2 === 0;
+
+                if (isContinuous) {
+                    const contVerb = sub.singular ? verb.ing : verb.ingPlural;
+                    const simpleVerb = sub.singular ? verb.s : verb.base;
+                    list.push({
+                        emoji: verb.emoji,
+                        marker: "now / Look!",
+                        words: [
+                            { en: "Look!", ru: "Смотри!" },
+                            { en: sub.en, ru: sub.ru },
+                            { en: "GAP", ru: "пропуск" },
+                            { en: "now.", ru: "сейчас." }
+                        ],
+                        translation: `Смотри! ${sub.ru} (${verb.trans}) сейчас.`,
+                        options: [contVerb, simpleVerb],
+                        correct: contVerb,
+                        rule: `⚡ Маркер **Look! / now** ➔ Выбираем Present Continuous (**${contVerb}**)!`
+                    });
+                } else {
+                    const simpleVerb = sub.singular ? verb.s : verb.base;
+                    const contVerb = sub.singular ? verb.ing : verb.ingPlural;
+                    list.push({
+                        emoji: verb.emoji,
+                        marker: "every day",
+                        words: [
+                            { en: sub.en, ru: sub.ru },
+                            { en: "GAP", ru: "пропуск" },
+                            { en: "every day.", ru: "каждый день." }
+                        ],
+                        translation: `${sub.ru} (${verb.trans}) каждый день.`,
+                        options: [simpleVerb, contVerb],
+                        correct: simpleVerb,
+                        rule: `🔄 Маркер **every day** (привычка) ➔ Выбираем Present Simple (**${simpleVerb}**)!`
+                    });
+                }
+                count++;
+            }
+            return list;
+        }
+
+        // Состояние игры
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        // Звуки через Web Audio API
+        function playSound(type) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                if (type === 'success') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        setTimeout(() => {
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.type = 'triangle';
+                            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                            osc.start();
+                            osc.stop(ctx.currentTime + 0.3);
+                        }, idx * 80);
+                    });
+                } else {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.25);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.25);
+                }
+            } catch(e) {}
+        }
+
+        // Рендер тултипа для слова
+        function createWordHtml(enWord, ruWord) {
+            if (enWord === "GAP") {
+                return `<span class="px-3 py-0.5 bg-amber-100 border-b-4 border-amber-400 rounded-xl text-amber-900 mx-1 font-black inline-block">?</span>`;
+            }
+            return `
+                <span class="hover-word mx-0.5">
+                    ${enWord}
+                    <span class="tooltip-text">${ruWord}</span>
+                </span>
+            `;
+        }
+
+        // Загрузка нового вопроса
+        function loadQuestion() {
+            isAnswered = false;
+            const q = questions[currentIndex];
+
+            // Индикаторы
+            document.getElementById('question-category').innerText = `Вопрос ${currentIndex + 1} из 100`;
+            document.getElementById('time-marker-badge').innerText = `⏱️ Маркер: ${q.marker}`;
+            document.getElementById('item-emoji').innerText = q.emoji;
+
+            // Формируем предложение с ховер-переводом
+            const sentenceContainer = document.getElementById('sentence-prompt');
+            sentenceContainer.innerHTML = q.words.map(w => createWordHtml(w.en, w.ru)).join(" ");
+
+            document.getElementById('sentence-translation').innerText = `(${q.translation})`;
+
+            // Сброс интерфейса
+            document.getElementById('feedback-card').classList.add('hidden');
+            document.getElementById('btn-next').classList.add('hidden');
+
+            // Варианты ответов
+            const answersContainer = document.getElementById('answers-container');
+            answersContainer.innerHTML = '';
+
+            // Перемешиваем кнопки ответов
+            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach(option => {
+                const btn = document.createElement('button');
+                btn.onclick = () => checkAnswer(option, btn);
+                btn.className = "btn-card py-3.5 px-3 rounded-2xl bg-white border-3 border-teal-200 text-teal-950 font-black text-lg shadow-sm hover:border-teal-400 hover:bg-teal-50 flex items-center justify-center gap-2 cursor-pointer";
+                btn.innerText = option;
+                answersContainer.appendChild(btn);
+            });
+        }
+
+        // Проверка ответа
+        function checkAnswer(selectedOption, clickedBtn) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const q = questions[currentIndex];
+            const feedbackCard = document.getElementById('feedback-card');
+            const answersContainer = document.getElementById('answers-container');
+            const buttons = answersContainer.querySelectorAll('button');
+
+            if (selectedOption.toLowerCase() === q.correct.toLowerCase()) {
+                // ПРАВИЛЬНО
+                clickedBtn.className = "btn-card py-3.5 px-3 rounded-2xl bg-emerald-500 border-3 border-emerald-600 text-white font-black text-lg shadow-md flex items-center justify-center gap-2";
+                clickedBtn.innerHTML = `${selectedOption} <i class="fa-solid fa-circle-check"></i>`;
+
+                score += 10;
+                document.getElementById('score-counter').innerText = score;
+                playSound('success');
+
+                // Заменяем пропуск на верный вариант в тексте
+                const sentenceContainer = document.getElementById('sentence-prompt');
+                sentenceContainer.innerHTML = q.words.map(w => {
+                    if (w.en === "GAP") {
+                        return `<span class="px-3 py-0.5 bg-emerald-500 text-white rounded-xl mx-1 font-black inline-block shadow-sm">${q.correct}</span>`;
+                    }
+                    return createWordHtml(w.en, w.ru);
+                }).join(" ");
+
+                feedbackCard.className = "p-3.5 rounded-2xl text-xs font-black bg-emerald-100 text-emerald-950 border-2 border-emerald-300 text-center";
+                feedbackCard.innerHTML = `🎉 Super! Отлично! ${q.rule}`;
+                feedbackCard.classList.remove('hidden');
+
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+
+            } else {
+                // ОШИБКА
+                clickedBtn.className = "btn-card py-3.5 px-3 rounded-2xl bg-rose-500 border-3 border-rose-600 text-white font-black text-lg shadow-md flex items-center justify-center gap-2";
+                clickedBtn.innerHTML = `${selectedOption} <i class="fa-solid fa-circle-xmark"></i>`;
+
+                playSound('error');
+
+                // Подсвечиваем верный
+                buttons.forEach(btn => {
+                    if (btn.innerText.trim().toLowerCase() === q.correct.toLowerCase()) {
+                        btn.className = "btn-card py-3.5 px-3 rounded-2xl bg-emerald-100 border-3 border-emerald-400 text-emerald-900 font-black text-lg";
+                    }
+                });
+
+                feedbackCard.className = "p-3.5 rounded-2xl text-xs font-black bg-rose-100 text-rose-950 border-2 border-rose-300 text-center";
+                feedbackCard.innerHTML = `🧐 Почти! Верный ответ: <b>${q.correct}</b>.<br>${q.rule}`;
+                feedbackCard.classList.remove('hidden');
+            }
+
+            document.getElementById('btn-next').classList.remove('hidden');
+        }
+
+        // Переход дальше
+        function nextQuestion() {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                loadQuestion();
+            } else {
+                // Победа
+                playSound('success');
+                confetti({ particleCount: 120, spread: 90, origin: { y: 0.5 } });
+
+                const feedbackCard = document.getElementById('feedback-card');
+                feedbackCard.className = "p-4 rounded-2xl text-sm font-black bg-amber-100 text-amber-950 border-2 border-amber-300 text-center space-y-1";
+                feedbackCard.innerHTML = `🏆 <b>Ура! Ты прошёл все 100 вопросов!</b><br>Финальный счёт: <b>${score}</b> ⭐`;
+                feedbackCard.classList.remove('hidden');
+
+                document.getElementById('btn-next').classList.add('hidden');
+            }
+        }
+
+        // Перезапуск игры
+        function resetGame() {
+            score = 0;
+            currentIndex = 0;
+            document.getElementById('score-counter').innerText = score;
+            // Перемешиваем вопросы
+            questions = generate100Questions().sort(() => Math.random() - 0.5);
+            loadQuestion();
+        }
+
+        // Запуск при загрузке
+        window.onload = function() {
+            resetGame();
+        };
+    </script>
+</body>
+</html>

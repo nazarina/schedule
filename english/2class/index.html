@@ -1,1 +1,547 @@
-q
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Английский язык (3 класс) | Кот и Код</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #E0F7FA;
+            background-image: radial-gradient(#B2EBF2 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .title-font {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+
+        @keyframes cat-bounce {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-5px) rotate(2deg); }
+        }
+        .wiggle-animation {
+            animation: cat-bounce 2.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        .pulse-btn {
+            animation: pulse-subtle 2s ease-in-out infinite;
+        }
+
+        .btn-card {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-card:hover {
+            transform: translateY(-2px);
+        }
+        .btn-card:active {
+            transform: translateY(1px) scale(0.98);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between py-4 px-3 sm:px-4 text-slate-800">
+
+    <!-- Основной контейнер тренажёра -->
+    <main class="flex-grow flex items-center justify-center w-full max-w-lg mx-auto">
+        <div class="w-full bg-white rounded-3xl shadow-xl border-4 border-teal-200 p-4 sm:p-6 space-y-4 relative overflow-hidden">
+            
+            <!-- Декоративные круги -->
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-amber-100 rounded-full -z-10"></div>
+            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-teal-100 rounded-full -z-10"></div>
+
+            <!-- Шапка с котиком и очками -->
+            <div class="flex justify-between items-center bg-gradient-to-r from-teal-50 to-emerald-50 p-3 rounded-2xl border-2 border-teal-200">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-11 h-11 bg-amber-400 text-white rounded-2xl flex items-center justify-center text-2xl shadow-md wiggle-animation">
+                        🐱
+                    </div>
+                    <div>
+                        <h1 class="text-base font-extrabold text-teal-950 leading-tight title-font">English 3 Class</h1>
+                        <p class="text-[11px] font-extrabold text-teal-600 tracking-wide">Кот-Грамотей</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <!-- Счётчик звёзд -->
+                    <div class="bg-amber-100 border-2 border-amber-300 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                        <span class="text-lg">⭐</span>
+                        <span class="text-base font-black text-amber-900" id="score-counter">0</span>
+                    </div>
+                    <!-- Перезапуск -->
+                    <button onclick="resetGame()" class="w-9 h-9 rounded-full bg-white border-2 border-teal-200 text-teal-600 hover:bg-teal-100 flex items-center justify-center transition-all shadow-sm" title="Начало">
+                        <i class="fa-solid fa-rotate-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Переключатель тем (Специально для 3 класса) -->
+            <div class="grid grid-cols-3 gap-1.5 bg-slate-100 p-1.5 rounded-2xl text-[11px] font-extrabold">
+                <button id="tab-havehas" onclick="setTopic('havehas')" class="py-2.5 px-1 rounded-xl transition-all shadow-sm bg-teal-600 text-white text-center leading-tight">
+                    🐾 Have / Has got
+                </button>
+                <button id="tab-can" onclick="setTopic('can')" class="py-2.5 px-1 rounded-xl transition-all text-slate-600 hover:text-slate-900 text-center leading-tight">
+                    🐸 Can / Can't
+                </button>
+                <button id="tab-vocab" onclick="setTopic('vocab')" class="py-2.5 px-1 rounded-xl transition-all text-slate-600 hover:text-slate-900 text-center leading-tight">
+                    🍕 Words (Слова)
+                </button>
+            </div>
+
+            <!-- Подсказка-памятка для темы (Минимум текста, максимум наглядности) -->
+            <div id="topic-hint" class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-2.5 text-center text-xs font-black text-amber-900 flex items-center justify-center gap-2 shadow-sm">
+                <!-- Заполняется динамически -->
+            </div>
+
+            <!-- Карточка задания -->
+            <div class="bg-gradient-to-b from-sky-50 to-teal-50/40 border-3 border-teal-200 rounded-2xl p-5 text-center space-y-4 relative shadow-sm">
+                
+                <!-- Номер вопроса -->
+                <div class="flex justify-between items-center text-[11px] font-black text-teal-700">
+                    <span class="bg-white/90 px-3 py-1 rounded-full border border-teal-200 shadow-2xs" id="question-category">
+                        Тема: Have got / Has got
+                    </span>
+                    <span id="progress-text" class="text-teal-800">1 из 10</span>
+                </div>
+
+                <!-- Картинка/Эмодзи предмета или персонажа -->
+                <div class="py-1">
+                    <span id="item-emoji" class="text-6xl drop-shadow-sm inline-block transform hover:scale-110 transition-transform">
+                        🐶
+                    </span>
+                </div>
+
+                <!-- Текст вопроса / Предложение с пропуском -->
+                <div class="bg-white p-4 rounded-2xl border-2 border-teal-100 shadow-sm">
+                    <p id="sentence-prompt" class="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-wide leading-relaxed">
+                        He <span class="px-3 py-0.5 bg-amber-100 border-b-4 border-amber-400 rounded-lg text-amber-900 mx-1 font-black">?</span> got a dog.
+                    </p>
+                    <p id="sentence-translation" class="text-xs font-bold text-slate-500 mt-2">
+                        (У него есть собака)
+                    </p>
+                </div>
+
+                <!-- Варианты ответов (Большие наглядные кнопки) -->
+                <div id="answers-container" class="grid grid-cols-2 gap-3 pt-1">
+                    <!-- Динамические кнопки ответов -->
+                </div>
+
+            </div>
+
+            <!-- Сообщение-объяснение после ответа -->
+            <div id="feedback-card" class="hidden p-3.5 rounded-2xl text-xs font-black transition-all border-2 text-center">
+                <!-- Заполняется скриптом -->
+            </div>
+
+            <!-- Кнопка "Дальше" -->
+            <button id="btn-next" onclick="nextQuestion()" class="hidden pulse-btn w-full text-white font-extrabold py-3.5 px-4 rounded-2xl shadow-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:opacity-95 active:scale-95 transition-all cursor-pointer text-base flex items-center justify-center gap-2">
+                <span>Next Question</span> 🐾 <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+        </div>
+    </main>
+
+    <!-- Подвал -->
+    <footer class="w-full text-center text-xs text-teal-800/80 font-extrabold mt-3">
+        Мастерская семейного обучения «Кот и Код»
+    </footer>
+
+    <script>
+        // База знаний для 3 класса по темам
+        const database = {
+            // ТЕМА 1: Have got / Has got
+            havehas: [
+                {
+                    emoji: "🐶",
+                    sentence: "He <span class='underline-gap'>?</span> got a dog.",
+                    translation: "У него есть собачка",
+                    options: ["has", "have"],
+                    correct: "has",
+                    rule: "💡 Помни: для **He / She / It** пишем **HAS got**!"
+                },
+                {
+                    emoji: "🍎",
+                    sentence: "I <span class='underline-gap'>?</span> got a red apple.",
+                    translation: "У меня есть красное яблоко",
+                    options: ["have", "has"],
+                    correct: "have",
+                    rule: "💡 Помни: для **I / You / We / They** пишем **HAVE got**!"
+                },
+                {
+                    emoji: "🐱",
+                    sentence: "She <span class='underline-gap'>?</span> got a fluffy cat.",
+                    translation: "У неё есть пушистый кот",
+                    options: ["has", "have"],
+                    correct: "has",
+                    rule: "💡 Помни: **She** (она) ➔ **HAS got**!"
+                },
+                {
+                    emoji: "🚗",
+                    sentence: "We <span class='underline-gap'>?</span> got a toy car.",
+                    translation: "У нас есть игрушечная машинка",
+                    options: ["have", "has"],
+                    correct: "have",
+                    rule: "💡 Помни: **We** (мы) ➔ **HAVE got**!"
+                },
+                {
+                    emoji: "🪆",
+                    sentence: "They <span class='underline-gap'>?</span> got big dolls.",
+                    translation: "У них есть большие куклы",
+                    options: ["have", "has"],
+                    correct: "have",
+                    rule: "💡 Помни: **They** (они) ➔ **HAVE got**!"
+                },
+                {
+                    emoji: "🚲",
+                    sentence: "You <span class='underline-gap'>?</span> got a new bike.",
+                    translation: "У тебя есть новый велосипед",
+                    options: ["have", "has"],
+                    correct: "have",
+                    rule: "💡 Помни: **You** (ты/вы) ➔ **HAVE got**!"
+                },
+                {
+                    emoji: "🐘",
+                    sentence: "It <span class='underline-gap'>?</span> got big ears.",
+                    translation: "У него (слона) большие уши",
+                    options: ["has", "have"],
+                    correct: "has",
+                    rule: "💡 Помни: **It** (оно/животное) ➔ **HAS got**!"
+                },
+                {
+                    emoji: "🎒",
+                    sentence: "My friend <span class='underline-gap'>?</span> got a green bag.",
+                    translation: "У моего друга есть зелёная портфель",
+                    options: ["has", "have"],
+                    correct: "has",
+                    rule: "💡 Друг (он) ➔ **HAS got**!"
+                }
+            ],
+
+            // ТЕМА 2: Can / Can't (Умеет / Не умеет)
+            can: [
+                {
+                    emoji: "🐸",
+                    sentence: "A frog <span class='underline-gap'>?</span> jump high.",
+                    translation: "Лягушка умеет прыгать высоко",
+                    options: ["can", "can't"],
+                    correct: "can",
+                    rule: "🐸 Лягушка отлично прыгает! Поэтому **can** (умеет)."
+                },
+                {
+                    emoji: "🐟",
+                    sentence: "A fish <span class='underline-gap'>?</span> fly in the sky.",
+                    translation: "Рыба не умеет летать в небе",
+                    options: ["can't", "can"],
+                    correct: "can't",
+                    rule: "🐟 Рыба плавает, но не летает! Выбираем **can't** (не умеет)."
+                },
+                {
+                    emoji: "🐦",
+                    sentence: "A bird <span class='underline-gap'>?</span> sing songs.",
+                    translation: "Птичка умеет петь песни",
+                    options: ["can", "can't"],
+                    correct: "can",
+                    rule: "🐦 Птички прекрасно поют! **can** (умеет)."
+                },
+                {
+                    emoji: "🐰",
+                    sentence: "A rabbit <span class='underline-gap'>?</span> read books.",
+                    translation: "Зайчик не умеет читать книги",
+                    options: ["can't", "can"],
+                    correct: "can't",
+                    rule: "🐰 Зайчики не умеют читать книги! **can't** (не умеет)."
+                },
+                {
+                    emoji: "🐒",
+                    sentence: "A monkey <span class='underline-gap'>?</span> climb trees.",
+                    translation: "Обезьянка умеет лазать по деревьям",
+                    options: ["can", "can't"],
+                    correct: "can",
+                    rule: "🐒 Обезьянки ловко лазают по веткам! **can** (умеет)."
+                },
+                {
+                    emoji: "🐍",
+                    sentence: "A snake <span class='underline-gap'>?</span> run fast.",
+                    translation: "Змея не умеет бегать (у неё нет ног!)",
+                    options: ["can't", "can"],
+                    correct: "can't",
+                    rule: "🐍 У змей нет лапок, они ползают! **can't** (не умеют бегать)."
+                }
+            ],
+
+            // ТЕМА 3: Картинки и слова (Словарный запас 3 класса)
+            vocab: [
+                {
+                    emoji: "🎒",
+                    sentence: "What is this? It is a <span class='underline-gap'>?</span>.",
+                    translation: "Что это? Это портфель",
+                    options: ["schoolbag", "pencil", "ruler"],
+                    correct: "schoolbag",
+                    rule: "🎒 Schoolbag = школьный портфель/рюкзак."
+                },
+                {
+                    emoji: "🍕",
+                    sentence: "I like to eat <span class='underline-gap'>?</span>.",
+                    translation: "Я люблю есть пиццу",
+                    options: ["pizza", "milk", "apple"],
+                    correct: "pizza",
+                    rule: "🍕 Pizza = пицца!"
+                },
+                {
+                    emoji: "🐻",
+                    sentence: "Look! This is a big <span class='underline-gap'>?</span>.",
+                    translation: "Смотри! Это большой медведь",
+                    options: ["bear", "fox", "rabbit"],
+                    correct: "bear",
+                    rule: "🐻 Bear = медведь."
+                },
+                {
+                    emoji: "🍦",
+                    sentence: "Yummy! Yummy! <span class='underline-gap'>?</span>!",
+                    translation: "Вкуснота! Мороженое!",
+                    options: ["Ice cream", "Orange", "Water"],
+                    correct: "Ice cream",
+                    rule: "🍦 Ice cream = мороженое."
+                },
+                {
+                    emoji: "🏫",
+                    sentence: "We go to <span class='underline-gap'>?</span> every day.",
+                    translation: "Мы ходим в школу каждый день",
+                    options: ["school", "park", "house"],
+                    correct: "school",
+                    rule: "🏫 School = школа."
+                },
+                {
+                    emoji: "🧸",
+                    sentence: "This is my favorite <span class='underline-gap'>?</span>.",
+                    translation: "Это моя любимая игрушка",
+                    options: ["toy", "book", "pen"],
+                    correct: "toy",
+                    rule: "🧸 Toy = игрушка."
+                },
+                {
+                    emoji: "🥛",
+                    sentence: "Cats like to drink <span class='underline-gap'>?</span>.",
+                    translation: "Кошки любят пить молоко",
+                    options: ["milk", "juice", "tea"],
+                    correct: "milk",
+                    rule: "🥛 Milk = молоко."
+                }
+            ]
+        };
+
+        // Состояние игры
+        let currentTopic = 'havehas';
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        // Звуковой эффект успеха (Web Audio API)
+        function playSuccessAudio() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // До-Ми-Соль-До
+                notes.forEach((freq, idx) => {
+                    setTimeout(() => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                        osc.start();
+                        osc.stop(ctx.currentTime + 0.3);
+                    }, idx * 90);
+                });
+            } catch(e) {}
+        }
+
+        // Звук ошибки (мягкий)
+        function playErrorAudio() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.25);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.25);
+            } catch(e) {}
+        }
+
+        // Выбор темы
+        function setTopic(topicKey) {
+            currentTopic = topicKey;
+            
+            // Обновляем вкладки
+            document.querySelectorAll('[id^="tab-"]').forEach(btn => {
+                btn.className = "py-2.5 px-1 rounded-xl transition-all text-slate-600 hover:text-slate-900 text-center leading-tight";
+            });
+            const activeBtn = document.getElementById('tab-' + topicKey);
+            activeBtn.className = "py-2.5 px-1 rounded-xl transition-all shadow-sm bg-teal-600 text-white text-center leading-tight font-black";
+
+            // Настраиваем памятку-подсказку
+            const hintBox = document.getElementById('topic-hint');
+            if (topicKey === 'havehas') {
+                hintBox.innerHTML = `<span>📌 <b>I/You/We/They</b> ➔ <span class="text-teal-700 bg-white px-2 py-0.5 rounded border border-teal-200">HAVE got</span></span>
+                                     <span><b>He/She/It</b> ➔ <span class="text-amber-800 bg-white px-2 py-0.5 rounded border border-amber-300">HAS got</span></span>`;
+            } else if (topicKey === 'can') {
+                hintBox.innerHTML = `<span>📌 <b>CAN</b> = умеет / может 👍</span>
+                                     <span><b>CAN'T</b> = не умеет 🙅‍♂️</span>`;
+            } else {
+                hintBox.innerHTML = `<span>📌 Выбирай правильное английское слово к картинке! 🎨</span>`;
+            }
+
+            // Перемешиваем вопросы
+            currentQuestions = [...database[topicKey]].sort(() => Math.random() - 0.5);
+            currentIndex = 0;
+            loadQuestion();
+        }
+
+        // Загрузка вопроса
+        function loadQuestion() {
+            isAnswered = false;
+            const q = currentQuestions[currentIndex];
+
+            // Категория и прогресс
+            const catName = currentTopic === 'havehas' ? 'Have got / Has got' : (currentTopic === 'can' ? "Can / Can't" : 'Words (Слова)');
+            document.getElementById('question-category').innerText = 'Тема: ' + catName;
+            document.getElementById('progress-text').innerText = `${currentIndex + 1} из ${currentQuestions.length}`;
+
+            // Картинка и предложение
+            document.getElementById('item-emoji').innerText = q.emoji;
+            document.getElementById('sentence-prompt').innerHTML = q.sentence.replace(
+                "<span class='underline-gap'>?</span>",
+                `<span class="px-3 py-0.5 bg-amber-100 border-b-4 border-amber-400 rounded-xl text-amber-900 mx-1 font-black inline-block">?</span>`
+            );
+            document.getElementById('sentence-translation').innerText = `(${q.translation})`;
+
+            // Скрываем обратную связь и кнопку Next
+            document.getElementById('feedback-card').classList.add('hidden');
+            document.getElementById('btn-next').classList.add('hidden');
+
+            // Рендер вариантов ответов
+            const answersContainer = document.getElementById('answers-container');
+            answersContainer.innerHTML = '';
+
+            // Если вариантов 2 — в 2 колонки, если 3 — красиво распределяем
+            q.options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.onclick = () => checkAnswer(option, btn);
+                btn.className = "btn-card py-3.5 px-4 rounded-2xl bg-white border-3 border-teal-200 text-teal-900 font-black text-lg shadow-sm hover:border-teal-400 hover:bg-teal-50/50 flex items-center justify-center gap-2 cursor-pointer";
+                btn.innerText = option;
+                answersContainer.appendChild(btn);
+            });
+        }
+
+        // Проверка ответа
+        function checkAnswer(selectedOption, clickedBtn) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const q = currentQuestions[currentIndex];
+            const feedbackCard = document.getElementById('feedback-card');
+            const answersContainer = document.getElementById('answers-container');
+
+            // Деактивируем все кнопки
+            const buttons = answersContainer.querySelectorAll('button');
+
+            if (selectedOption.toLowerCase() === q.correct.toLowerCase()) {
+                // ПРАВИЛЬНО!
+                clickedBtn.className = "btn-card py-3.5 px-4 rounded-2xl bg-emerald-500 border-3 border-emerald-600 text-white font-black text-lg shadow-md flex items-center justify-center gap-2";
+                clickedBtn.innerHTML = `${selectedOption} <i class="fa-solid fa-circle-check"></i>`;
+
+                score += 10;
+                document.getElementById('score-counter').innerText = score;
+                playSuccessAudio();
+
+                // Обновляем текст в предложении
+                document.getElementById('sentence-prompt').innerHTML = q.sentence.replace(
+                    "<span class='underline-gap'>?</span>",
+                    `<span class="px-3 py-0.5 bg-emerald-500 text-white rounded-xl mx-1 font-black inline-block shadow-sm">${q.correct}</span>`
+                );
+
+                feedbackCard.className = "p-3.5 rounded-2xl text-xs font-black bg-emerald-100 text-emerald-950 border-2 border-emerald-300 text-center";
+                feedbackCard.innerHTML = `🎉 Super! Всё верно! ${q.rule}`;
+                feedbackCard.classList.remove('hidden');
+
+                // Конфетти при успехе
+                confetti({ particleCount: 50, spread: 50, origin: { y: 0.7 } });
+
+            } else {
+                // ОШИБКА
+                clickedBtn.className = "btn-card py-3.5 px-4 rounded-2xl bg-rose-500 border-3 border-rose-600 text-white font-black text-lg shadow-md flex items-center justify-center gap-2";
+                clickedBtn.innerHTML = `${selectedOption} <i class="fa-solid fa-circle-xmark"></i>`;
+
+                playErrorAudio();
+
+                // Находим и подсвечиваем верный
+                buttons.forEach(btn => {
+                    if (btn.innerText.trim().toLowerCase() === q.correct.toLowerCase()) {
+                        btn.className = "btn-card py-3.5 px-4 rounded-2xl bg-emerald-100 border-3 border-emerald-400 text-emerald-900 font-black text-lg";
+                    }
+                });
+
+                feedbackCard.className = "p-3.5 rounded-2xl text-xs font-black bg-rose-100 text-rose-950 border-2 border-rose-300 text-center";
+                feedbackCard.innerHTML = `🧐 Почти! Правильный ответ: <b>${q.correct}</b>.<br>${q.rule}`;
+                feedbackCard.classList.remove('hidden');
+            }
+
+            // Показываем кнопку перехода
+            document.getElementById('btn-next').classList.remove('hidden');
+        }
+
+        // Следующий вопрос
+        function nextQuestion() {
+            if (currentIndex < currentQuestions.length - 1) {
+                currentIndex++;
+                loadQuestion();
+            } else {
+                // Завершение раунда
+                playSuccessAudio();
+                confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
+
+                const feedbackCard = document.getElementById('feedback-card');
+                feedbackCard.className = "p-4 rounded-2xl text-sm font-black bg-amber-100 text-amber-950 border-2 border-amber-300 text-center space-y-1";
+                feedbackCard.innerHTML = `🏆 <b>Молодец! Ты прошёл всю тему!</b><br>Набрано очков: <b>${score}</b> ⭐`;
+                feedbackCard.classList.remove('hidden');
+
+                document.getElementById('btn-next').classList.add('hidden');
+            }
+        }
+
+        // Перезапуск игры
+        function resetGame() {
+            score = 0;
+            document.getElementById('score-counter').innerText = score;
+            setTopic(currentTopic);
+        }
+
+        // Запуск при загрузке
+        window.onload = function() {
+            setTopic('havehas');
+        };
+    </script>
+</body>
+</html>
